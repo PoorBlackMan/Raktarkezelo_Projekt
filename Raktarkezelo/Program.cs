@@ -1,3 +1,7 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Raktarkezelo.Data;
+
 namespace Raktarkezelo
 {
     public class Program
@@ -8,6 +12,8 @@ namespace Raktarkezelo
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddDbContext<RaktarDb>(options => options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Database=RaktarDb;Trusted_Connection=True"));
 
             var app = builder.Build();
 
