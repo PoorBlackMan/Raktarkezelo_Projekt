@@ -1,19 +1,42 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Kezdőlap";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Üdvözöllek az oldalon!</h1>
 
-    <a asp-controller="RegLog"
-       asp-action="Login"
-       class="btn btn-success">
-        Login
-    </a>
+<style>
 
-    <a asp-controller="RegLog"
-       asp-action="Register"
-       class="btn btn-danger">
-        Register
-    </a>
+      
+</style>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-body p-4 text-center">
+                    <h1 class="h3 mb-2">Raktárkezelő</h1>
+                    <p class="text-muted mb-4">A rendszer használatához jelentkezz be vagy regisztrálj.</p>
+
+                    <div class="d-grid gap-2">
+                        <a asp-controller="RegLog" asp-action="Login" class="btn btn-primary btn-lg">
+                            Bejelentkezés
+                        </a>
+                        <a asp-controller="RegLog" asp-action="Register" class="btn btn-outline-secondary btn-lg">
+                            Regisztráció
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div style="height:5px; background:#4e8cff;"></div>
+
+            <marquee behavior="scroll" direction="left">
+                Üdv a Raktárkezelő rendszerben! Bejelentkezés után elérhető a készlet és a riportok.
+            </marquee>
+            
+
+            
+            <p class="text-center text-muted mt-3 mb-0" style="font-size: 0.9rem;">
+                Technikus vizsga projekt – Raktárnyilvántartó
+            </p>
+        </div>
+    </div>
 </div>

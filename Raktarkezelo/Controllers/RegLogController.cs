@@ -1,80 +1,106 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Raktarkezelo.Data;
+using Raktarkezelo.Models.User;
 using System.Security.Cryptography;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
-using Raktarkezelo.Models.User;
 
-
-public class RegLogController : Controller
+namespace Raktarkezelo.Controllers
 {
-    private readonly RaktarDb _context;
-
-    public RegLogController(RaktarDb context)
+    public class RegLogController : Controller
     {
-        _context = context;
-    }
+        private readonly RaktarDb _context;
 
-    public IActionResult Register()
-    {
-        return View();
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(Userinfo model)
-    {
-        if (ModelState.IsValid)
+        public RegLogController(RaktarDb context)
         {
-            // Ellenőrizzük, hogy létezik-e már az email
-            if (await _context.User.AnyAsync(u => u.Email == model.Email))
+            _context = context;
+        }
+
+        // ===== REGISTER =====
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View(new RegisterViewModel());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(RegisterViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            // Email már létezik?
+            bool emailExists = await _context.User.AnyAsync(u => u.Email == model.Email);
+            if (emailExists)
             {
-                ModelState.AddModelError("", "Ez az email már regisztrálva van!");
+                ModelState.AddModelError("Email", "Ez az email már regisztrálva van!");
                 return View(model);
             }
 
-            // Jelszó hash-elése
-            model.Password = HashPassword(model.Password);
+            // (Opcionális) Username már létezik?
+            bool usernameExists = await _context.User.AnyAsync(u => u.Username == model.Username);
+            if (usernameExists)
+            {
+                ModelState.AddModelError("Username", "Ez a felhasználónév már foglalt!");
+                return View(model);
+            }
 
-            _context.User.Add(model);
+            var user = new Userinfo
+            {
+                Email = model.Email,
+                Username = model.Username,
+                Password = HashPassword(model.Password)
+            };
+
+            _context.User.Add(user);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Login");
+            return RedirectToAction(nameof(Login));
         }
 
-        return View(model);
-    }
+        // ===== LOGIN =====
 
-    public IActionResult Login()
-    {
-        return View();
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Login(string email, string password)
-    {
-        string hashedPassword = HashPassword(password);
-
-        var user = await _context.User
-            .FirstOrDefaultAsync(u => u.Email == email && u.Password == hashedPassword);
-
-        if (user != null)
+        [HttpGet]
+        public IActionResult Login()
         {
-            // Ide jöhet majd a session kezelés
-            return RedirectToAction("Index", "Home");
+            return View(new LoginViewModel());
         }
 
-        ModelState.AddModelError("", "Hibás email vagy jelszó!");
-        return View();
-    }
-
-    private string HashPassword(string password)
-    {
-        using (SHA256 sha256 = SHA256.Create())
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
-            var bytes = Encoding.UTF8.GetBytes(password);
-            var hash = sha256.ComputeHash(bytes);
-            return Convert.ToBase64String(hash);
+            if (!ModelState.IsValid)
+                return View(model);
+
+            string hashedPassword = HashPassword(model.Password);
+
+            var user = await _context.User.FirstOrDefaultAsync(u =>
+                u.Email == model.Email && u.Password == hashedPassword);
+
+            if (user == null)
+            {
+                // Globális hiba (nem mezőhöz kötött)
+                ModelState.AddModelError("", "Hibás email vagy jelszó!");
+                return View(model);
+            }
+
+            // Itt majd később: Cookie Auth / Session
+            return RedirectToAction("Main", "Main");
+        }
+
+        // ===== HASH =====
+
+        private static string HashPassword(string password)
+        {
+            using (SHA256 sha256 = SHA256.Create())
+            {
+                var bytes = Encoding.UTF8.GetBytes(password);
+                var hash = sha256.ComputeHash(bytes);
+                return Convert.ToBase64String(hash);
+            }
         }
     }
 }
