@@ -31,6 +31,7 @@ namespace Raktarkezelo.Controllers
             if (!ModelState.IsValid)
                 return View(model);
 
+            
             // Email már létezik?
             bool emailExists = await _context.User.AnyAsync(u => u.Email == model.Email);
             if (emailExists)
@@ -44,6 +45,11 @@ namespace Raktarkezelo.Controllers
             if (usernameExists)
             {
                 ModelState.AddModelError("Username", "Ez a felhasználónév már foglalt!");
+                return View(model);
+            }
+            if (model.Username == model.Password) 
+            {
+                ModelState.AddModelError("Password", "A felhasználónév nem lehet ugyan az, mint a jelszó");
                 return View(model);
             }
 
