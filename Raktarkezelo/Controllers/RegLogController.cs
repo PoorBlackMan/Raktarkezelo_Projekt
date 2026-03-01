@@ -16,7 +16,7 @@ namespace Raktarkezelo.Controllers
             _context = context;
         }
 
-        // ===== REGISTER =====
+        // ===== REGISTER ====
 
         [HttpGet]
         public IActionResult Register()

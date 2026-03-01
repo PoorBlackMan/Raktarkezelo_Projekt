@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "Inbound";
+}
+
+<h1>Inbound</h1>
+
+<form method="post">
+    <div>
+        <label>Product:</label>
+        <select>
+            <option>Product 1</option>
+            <option>Product 2</option>
+        </select>
+    </div>
+
+    <div>
+        <label>Quantity:</label>
+        <input type="number" />
+    </div>
+
+    <div>
+        <label>Date:</label>
+        <input type="date" />
+    </div>
+
+    <button type="submit">Save</button>
+</form>
+
+<hr />
+
+<h3>Recent Inbound Transactions</h3>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Date</th>
+    </tr>
+    <tr>
+        <td>Sample</td>
+        <td>10</td>
+        <td>2026-02-26</td>
+    </tr>
+</table>

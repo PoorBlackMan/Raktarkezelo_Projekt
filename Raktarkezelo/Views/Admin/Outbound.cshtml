@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Outbound";
+}
+
+<h1>Outbound</h1>
+
+<form method="post">
+    <div>
+        <label>Product:</label>
+        <select>
+            <option>Product 1</option>
+            <option>Product 2</option>
+        </select>
+    </div>
+
+    <div>
+        <label>Quantity:</label>
+        <input type="number" />
+    </div>
+
+    <button type="submit">Save</button>
+</form>
+
+<hr />
+
+<h3>Recent Outbound Transactions</h3>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Date</th>
+    </tr>
+    <tr>
+        <td>Sample</td>
+        <td>5</td>
+        <td>2026-02-26</td>
+    </tr>
+</table>
