@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Raktarkezelo.Models.Stock
+namespace Raktarkezelo.Models.Entities
 {
     public class Products
     {
@@ -12,6 +12,8 @@ namespace Raktarkezelo.Models.Stock
         [Range (0,200)]
         public int Stock { get; set; }
         public string Note { get; set; } = string.Empty;
+        public ICollection<StockTransactions> StockTransactions { get; set; } = new List<StockTransactions>();
+
 
     }
 }

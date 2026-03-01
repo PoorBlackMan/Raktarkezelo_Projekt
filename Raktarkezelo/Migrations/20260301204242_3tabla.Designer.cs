@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Raktarkezelo.Data;
 
@@ -11,9 +12,11 @@ using Raktarkezelo.Data;
 namespace Raktarkezelo.Migrations
 {
     [DbContext(typeof(RaktarDb))]
-    partial class RaktarDbModelSnapshot : ModelSnapshot
+    [Migration("20260301204242_3tabla")]
+    partial class _3tabla
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

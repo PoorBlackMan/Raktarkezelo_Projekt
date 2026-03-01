@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-namespace Raktarkezelo.Models.User
+namespace Raktarkezelo.Models.Entities
 {
     public class Userinfo
     {
@@ -17,12 +17,19 @@ namespace Raktarkezelo.Models.User
         [Required(ErrorMessage = "Nem adtál meg jelszót!")]
         [MinLength(8, ErrorMessage = "A jelszónak legalább 8 karakter hosszúnak kell lennie.")]
         [DataType(DataType.Password)]
-        public string Password { get; set; } = string.Empty;
+        public string Passwordhash { get; set; } = string.Empty;
+        [Required]
+        public string Role { get; set; } = "Felhasználó";
+
 
         [NotMapped]
         [Required(ErrorMessage = "A jelszó megerősítése kötelező")]
         [Compare("Password", ErrorMessage = "A két jelszó nem egyezik")]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; } = string.Empty;
+        public bool IsActive { get; set; } = true;
+
+        public ICollection<StockTransactions> StockTransactions { get; set; } = new List<StockTransactions>();
+
     }
 }
