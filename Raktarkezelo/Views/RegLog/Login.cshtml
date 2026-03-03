@@ -2,49 +2,93 @@
 @{
     ViewData["Title"] = "Bejelentkezés";
 }
-
 <style>
-    #sigma {
+    body {
+        background-color:white;
+    }
+
+    .main {
+        background-color: white;
+
+        width: 30%;
+        height: 60%;
+
+        margin: auto;
+
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+
+        position: absolute;
+
+        border-radius: 5%;
+
+        padding: 1%;
+
         color: black;
+
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+    }
+
+    p{
+        font-family:Arial;
+        font-weight:bold;
+        font-size: 30px;
+        text-align: center;
+    }
+
+    .textinput {
+        width:70%;
+    }
+
+    .label {
+        
+    }
+
+    .login {
+        margin-left:25%;
+
+    }
+
+    img {
+        width: 30%;
+        height: 30%;
     }
 </style>
 
-<div class="container" style="margin-top:80px; max-width:450px;" id="sigma">
-    <div class="card shadow-sm" style="padding:25px; border-radius:15px;">
+<div class="main">
+    <form asp-action="Login" method="post">
+        @Html.AntiForgeryToken()
 
-        <h3 class="text-center mb-4">Bejelentkezés</h3>
+        <div class="text-danger">
+            @Html.ValidationSummary(false)
+        </div>
+        <div align="center">
+            <img src="" alt="Logo" />
+        </div>
 
-        <form asp-action="Login" method="post">
-            @Html.AntiForgeryToken()
+        <p>Bejelentkezés</p>
 
-            <div class="text-danger mb-3">
-                @Html.ValidationSummary(false)
+        <div class="login">
+            <input asp-for="Email" class="textinput" placeholder="Email" />
+            <br />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <br />
+        <div class="login">
+            <input asp-for="Password" class="textinput" placeholder="Password"/>
+            <br />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <br />
+        <div align="center">
+            <button type="submit" class="btn btn-primary" style="font-weight:bold; ">Bejelentkezés</button>
             </div>
-
-            <div class="mb-3">
-                <label asp-for="Email" class="form-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-
-            <div class="mb-4">
-                <label asp-for="Password" class="form-label"></label>
-                <input asp-for="Password" class="form-control" />
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">
-                Bejelentkezés
-            </button>
-            <button type="submit" class="btn btn-close">
-                Vissza
-            </button>
-
-        </form>
-
-    </div>
+    </form>
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+@section Scripts 
+{
+<partial name="_ValidationScriptsPartial" />
 }

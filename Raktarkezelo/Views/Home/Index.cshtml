@@ -1,49 +1,62 @@
 ﻿@{
     ViewData["Title"] = "Kezdőlap";
 }
-
-
 <style>
-    
-    #sigma {
-        color: black;
+    body {
+        background-color:white;
     }
-    #mygoat{
-        color:whitesmoke;
+
+    .main {
+        background-color:white;
+
+        width:30%;
+        height:60%;
+
+        margin: auto;
+
+        top:0;
+        left:0;
+        bottom:0;
+        right:0;
+
+        position:absolute;
+
+        border-radius: 5%;
+        padding: 1%;
+
+        color:black;
+
+        text-align:center;
+
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
     }
+
+    img {
+        margin:auto;
+    }
+
+    a {
+        width:50%;
+        margin-bottom: 5%;
+    }
+
+    p {
+        font-size: 30px;
+        font-family:Arial;
+        font-weight:bold;
+    }
+
+    img {
+        width: 30%;
+        height: 30%;
+    }
+
 </style>
-      
-<br>
-<div class="container py-5" id="sigma">
-    <div class="row justify-content-center">
-        <div class="col-md-7 col-lg-5">
-            <div class="card shadow-sm">
-                <div class="card-body p-4 text-center">
-                    <h1 class="h3 mb-2">Raktárkezelő</h1>
-                    <p class="text-muted mb-4">A rendszer használatához jelentkezz be vagy regisztrálj.</p>
 
-                    <div class="d-grid gap-2">
-                        <a asp-controller="RegLog" asp-action="Login" class="btn btn-primary btn-lg">
-                            Bejelentkezés
-                        </a>
-                        <a asp-controller="RegLog" asp-action="Register" class="btn btn-outline-secondary btn-lg">
-                            Regisztráció
-                        </a>
-                    </div>
-                </div>
-            </div>
+<div class="main">
+    <img src="" alt="Logo" />
+    <p>Jelentkezz be vagy regisztrálj az oldalra!</p>
 
-            <div style="height:5px; background:#4e8cff;"></div>
-            <div id="mygoat">
-            <marquee behavior="scroll" direction="left">
-                Üdv a Raktárkezelő rendszerben! Bejelentkezés után elérhető a készlet és a riportok.
-            </marquee>
-            </div>
-
-            
-            <p class="text-center text-muted mt-3 mb-0" style="font-size: 0.9rem;">
-                Technikus vizsga projekt – Raktárnyilvántartó
-            </p>
-        </div>
-    </div>
+    <a class="btn btn-primary" style="font-weight:bold" asp-controller="RegLog" asp-action="Login">Bejeletnkezés</a>
+    <a class="btn btn-secondary" style="font-weight:bold" asp-controller="RegLog" asp-action="Register">Regisztráció</a>
 </div>
