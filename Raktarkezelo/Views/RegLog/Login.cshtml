@@ -29,6 +29,7 @@
         color: black;
 
         box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+        text-align:center;
     }
 
     p{
@@ -38,22 +39,8 @@
         text-align: center;
     }
 
-    .textinput {
-        width:70%;
-    }
-
-    .label {
-        
-    }
-
-    .login {
-        margin-left:25%;
-
-    }
-
-    img {
-        width: 30%;
-        height: 30%;
+    .warning {
+        text-align:center;
     }
 </style>
 
@@ -64,28 +51,25 @@
         <div class="text-danger">
             @Html.ValidationSummary(false)
         </div>
-        <div align="center">
+        <div>
             <img src="" alt="Logo" />
         </div>
 
         <p>Bejelentkezés</p>
-
-        <div class="login">
-            <input asp-for="Email" class="textinput" placeholder="Email" />
-            <br />
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
+            <input asp-for="Email" class="form-control" placeholder="Email" />
         <br />
-        <div class="login">
-            <input asp-for="Password" class="textinput" placeholder="Password"/>
-            <br />
-            <span asp-validation-for="Password" class="text-danger"></span>
-        </div>
+            <input asp-for="Password" class="form-control" placeholder="Password" />
         <br />
         <div align="center">
             <button type="submit" class="btn btn-primary" style="font-weight:bold; ">Bejelentkezés</button>
-            </div>
+        </div>
     </form>
+</div>
+<br />
+<div class="warning">
+    <span asp-validation-for="Email" class="text-danger"></span>
+     <br />
+    <span asp-validation-for="Password" class="text-danger"></span>
 </div>
 
 @section Scripts 

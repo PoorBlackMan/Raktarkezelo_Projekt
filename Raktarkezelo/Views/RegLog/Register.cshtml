@@ -24,10 +24,6 @@
         box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
     }
 
-    .textinput {
-        width: 70%;
-    }
-
     p {
         font-size:30px;
         font-family:Arial;
@@ -51,22 +47,16 @@
         </div>
         <p>Regisztráció</p>
         <br />
-        <div>
-            <input asp-for="Email" class="textinput" placeholder="Email" />
-        </div>
+
+            <input asp-for="Email" class="form-control" placeholder="Email" />
         <br />
-        <div>
-            <input asp-for="Username" class="textinput" placeholder="Username" />
-        </div>
+            <input asp-for="Username" class="form-control" placeholder="Username" />
         <br />
-        <div>
-            <input asp-for="Password" class="textinput" placeholder="Password" />
-        </div>
+            <input asp-for="Password" class="form-control" placeholder="Password" />
         <br />
-        <div>
-            <input asp-for="ConfirmPassword" class="textinput" placeholder="ConfirmPassword" />
-        </div>
+            <input asp-for="ConfirmPassword" class="form-control" placeholder="ConfirmPassword" />
         <br />
+
         <button type="submit" class="btn btn-primary">Regisztráció</button>
     </form>
 </div>
@@ -81,3 +71,7 @@
     <br />
     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
