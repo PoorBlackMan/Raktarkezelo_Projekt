@@ -12,8 +12,8 @@ using Raktarkezelo.Data;
 namespace Raktarkezelo.Migrations
 {
     [DbContext(typeof(RaktarDb))]
-    [Migration("20260301204242_3tabla")]
-    partial class _3tabla
+    [Migration("20260303090748_haromtabla")]
+    partial class haromtabla
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -104,9 +104,8 @@ namespace Raktarkezelo.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
 
                     b.Property<string>("Username")
                         .IsRequired()
@@ -120,7 +119,18 @@ namespace Raktarkezelo.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Userinfos");
+                    b.ToTable("Userinfo");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 999,
+                            Email = "admin@gmail.com",
+                            IsActive = true,
+                            Passwordhash = "adminkarakter",
+                            Role = 1,
+                            Username = "defaultadmin"
+                        });
                 });
 
             modelBuilder.Entity("Raktarkezelo.Models.Entities.StockTransactions", b =>

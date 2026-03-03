@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Raktarkezelo.Data;
 using Raktarkezelo.Models.Entities;
 using Raktarkezelo.Models.User;
+using Raktarkezelo.Models.Enums;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -26,36 +30,19 @@ namespace Raktarkezelo.Controllers
         {
             if (!ModelState.IsValid) return View(model);
 
-            bool emailExists = await _context.Userinfos.AnyAsync(u => u.Email == model.Email);
-            if (emailExists)
-            {
-                ModelState.AddModelError("Email", "Ez az email már regisztrálva van!");
-                return View(model);
-            }
-
-            bool usernameExists = await _context.Userinfos.AnyAsync(u => u.Username == model.Username);
-            if (usernameExists)
-            {
-                ModelState.AddModelError("Username", "Ez a felhasználónév már foglalt!");
-                return View(model);
-            }
-
-            if (model.Username == model.Password)
-            {
-                ModelState.AddModelError("Password", "A felhasználónév nem lehet ugyanaz, mint a jelszó!");
-                return View(model);
-            }
-
             var user = new Userinfo
             {
                 Email = model.Email,
                 Username = model.Username,
                 Passwordhash = HashPassword(model.Password),
-                Role = "Felhasználó",
+
+                // 🔥 ENUM STRING
+                Role = UserRole.User,
+
                 IsActive = true
             };
 
-            _context.Userinfos.Add(user);
+            _context.Userinfo.Add(user);
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Login));
@@ -72,8 +59,10 @@ namespace Raktarkezelo.Controllers
 
             string hashedPassword = HashPassword(model.Password);
 
-            var user = await _context.Userinfos.FirstOrDefaultAsync(u =>
-                u.Email == model.Email && u.Passwordhash == hashedPassword);
+            var user = await _context.Userinfo
+                .FirstOrDefaultAsync(u =>
+                    u.Email == model.Email &&
+                    u.Passwordhash == hashedPassword);
 
             if (user == null)
             {
@@ -87,7 +76,33 @@ namespace Raktarkezelo.Controllers
                 return View(model);
             }
 
+            // 🔐 COOKIE LOGIN
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Username.ToString()),
+                new Claim(ClaimTypes.Role, user.Role.ToString())
+            };
+
+            var claimsIdentity = new ClaimsIdentity(
+                claims,
+                CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                claimsPrincipal);
+
             return RedirectToAction("Main", "Main");
+        }
+
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme);
+
+            return RedirectToAction("Index", "Home");
         }
 
         private static string HashPassword(string password)

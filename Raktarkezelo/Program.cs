@@ -1,5 +1,5 @@
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using Raktarkezelo.Data;
 
 namespace Raktarkezelo
@@ -10,18 +10,26 @@ namespace Raktarkezelo
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            builder.Services.AddDbContext<RaktarDb>(options => options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Database=RaktarDb;Trusted_Connection=True"));
+            builder.Services.AddDbContext<RaktarDb>(options =>
+                options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Database=RaktarDb;Trusted_Connection=True"));
+
+            // 🔐 AUTHENTICATION
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/RegLog/Login";
+                    options.AccessDeniedPath = "/Main/Main";
+                });
+
+            builder.Services.AddAuthorization();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -30,6 +38,8 @@ namespace Raktarkezelo
 
             app.UseRouting();
 
+            // FONTOS SORREND
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(

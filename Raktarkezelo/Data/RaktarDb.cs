@@ -7,7 +7,7 @@ namespace Raktarkezelo.Data
     {
         public RaktarDb(DbContextOptions<RaktarDb> options) : base(options) { }
 
-        public DbSet<Userinfo> Userinfos => Set<Userinfo>();
+        public DbSet<Userinfo> Userinfo => Set<Userinfo>();
         public DbSet<Products> Products => Set<Products>();
         public DbSet<StockTransactions> StockTransactions => Set<StockTransactions>();
 
@@ -37,6 +37,19 @@ namespace Raktarkezelo.Data
 
             modelBuilder.Entity<StockTransactions>()
                  .ToTable(t => t.HasCheckConstraint("CK_StockTransactions_Type", "[Type] IN ('IN','OUT','ADJUST')"));
+
+            modelBuilder.Entity<Userinfo>().HasData(
+                new Userinfo
+                {
+                    Id = 999,
+                    Email = "admin@gmail.com",
+                    Username = "defaultadmin",
+                    Role = Models.Enums.UserRole.Admin,
+                    Passwordhash = "adminkarakter",
+                    ConfirmPassword = "adminkarakter",
+                    IsActive = true
+                }
+            );
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Raktarkezelo.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 namespace Raktarkezelo.Models.Entities
 {
@@ -19,7 +20,7 @@ namespace Raktarkezelo.Models.Entities
         [DataType(DataType.Password)]
         public string Passwordhash { get; set; } = string.Empty;
         [Required]
-        public string Role { get; set; } = "Felhasználó";
+        public UserRole Role { get; set; }
 
 
         [NotMapped]
