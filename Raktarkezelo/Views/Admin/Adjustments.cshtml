@@ -1,27 +1,76 @@
-﻿@{
+﻿@model Raktarkezelo.Models.Viewmodel.AdjustmentViewModel
+@using Raktarkezelo.Models.Entities
+
+@{
     ViewData["Title"] = "Adjustments";
+    var transactions = ViewBag.RecentTransactions as List<StockTransactions> ?? new List<StockTransactions>();
 }
 
-<h1>Stock Adjustments</h1>
+<div class="container py-4">
+    <h1>Stock Adjustments</h1>
 
-<form method="post">
-    <div>
-        <label>Product:</label>
-        <select>
-            <option>Product 1</option>
-            <option>Product 2</option>
-        </select>
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form asp-action="Adjustments" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="text-danger mb-3">
+                    @Html.ValidationSummary(false)
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ProductId" class="form-label">Product</label>
+                    <select asp-for="ProductId" asp-items="Model.Products" class="form-select">
+                        <option value="">-- Válassz terméket --</option>
+                    </select>
+                    <span asp-validation-for="ProductId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="NewQuantity" class="form-label">New Quantity</label>
+                    <input asp-for="NewQuantity" class="form-control" />
+                    <span asp-validation-for="NewQuantity" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Reason" class="form-label">Reason</label>
+                    <input asp-for="Reason" class="form-control" />
+                    <span asp-validation-for="Reason" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Apply</button>
+                <a asp-controller="Main" asp-action="Main" class="btn btn-secondary">Vissza</a>
+            </form>
+        </div>
     </div>
 
-    <div>
-        <label>New Quantity:</label>
-        <input type="number" />
-    </div>
+    <h3>Recent Adjustment Transactions</h3>
 
-    <div>
-        <label>Reason:</label>
-        <input type="text" />
-    </div>
+    <table class="table table-dark table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>User</th>
+                <th>Reason</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in transactions)
+            {
+                <tr>
+                    <td>@item.Product.Name</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.User.Username</td>
+                    <td>@item.Note</td>
+                    <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
-    <button type="submit">Apply</button>
-</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

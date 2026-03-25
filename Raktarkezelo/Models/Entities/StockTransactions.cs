@@ -15,13 +15,14 @@ namespace Raktarkezelo.Models.Entities
         public int UserId { get; set; }
         public Userinfo User { get; set; } = null!;
 
-        // IN / OUT / ADJUST
         [Required]
         public string Type { get; set; } = "IN";
 
         [Required]
         public int Quantity { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public string Note { get; set; } = string.Empty;
+
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
 }

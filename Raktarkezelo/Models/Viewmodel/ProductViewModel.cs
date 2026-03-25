@@ -1,10 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Raktarkezelo.Models.Entities
+namespace Raktarkezelo.Models.Viewmodel
 {
-    public class Products
+    public class ProductViewModel
     {
-        [Key]
         public int ProductId { get; set; }
 
         [Required]
@@ -20,7 +19,5 @@ namespace Raktarkezelo.Models.Entities
         public int MinStock { get; set; }
 
         public string Note { get; set; } = string.Empty;
-
-        public ICollection<StockTransactions> StockTransactions { get; set; } = new List<StockTransactions>();
     }
 }
