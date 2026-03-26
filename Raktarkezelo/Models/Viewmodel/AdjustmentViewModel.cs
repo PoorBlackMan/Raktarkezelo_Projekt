@@ -8,7 +8,7 @@ namespace Raktarkezelo.Models.Viewmodel
         [Required]
         public int ProductId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Új készlet megadása kötelező.")]
         public int NewQuantity { get; set; }
 
         [Required]

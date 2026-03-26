@@ -30,9 +30,9 @@
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Stock" class="form-label"></label>
-                    <input asp-for="Stock" class="form-control" />
-                    <span asp-validation-for="Stock" class="text-danger"></span>
+                    <label class="form-label">Aktuális készlet</label>
+                    <input value="@Model.Stock" class="form-control" readonly />
+                    <div class="form-text">A készletszint csak készletmozgással módosítható.</div>
                 </div>
 
                 <div class="mb-3">

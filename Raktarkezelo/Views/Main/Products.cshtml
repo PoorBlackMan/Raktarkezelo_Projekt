@@ -6,14 +6,55 @@
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Products</h1>
+        <h1>Termékek</h1>
 
         @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
         {
             <a asp-action="CreateProduct" class="btn btn-primary">+ Add New Product</a>
         }
     </div>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    <form method="get" class="row g-2 mb-3">
+
+        <div class="col-md-4">
+            <input type="text" name="search" class="form-control" placeholder="Keresés név alapján..." value="@Context.Request.Query["search"]" />
+        </div>
+
+        <div class="col-md-3">
+            <select name="category" class="form-select">
+                <option value="">-- Összes kategória --</option>
+                @foreach (var cat in ViewBag.Categories)
+                {
+                    <option value="@cat" selected="@(Context.Request.Query["category"] == cat)">
+                        @cat
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2 form-check mt-2">
+            <input type="checkbox" name="lowStockOnly" value="true" class="form-check-input"
+                   @(Context.Request.Query["lowStockOnly"] == "true" ? "checked" : "") />
+            <label class="form-check-label">Alacsony készlet</label>
+        </div>
+
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100">Szűrés</button>
+        </div>
+
+    </form>
     <table class="table table-dark table-striped table-bordered align-middle">
         <thead>
             <tr>

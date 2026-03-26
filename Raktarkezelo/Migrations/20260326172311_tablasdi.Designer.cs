@@ -12,8 +12,8 @@ using Raktarkezelo.Data;
 namespace Raktarkezelo.Migrations
 {
     [DbContext(typeof(RaktarDb))]
-    [Migration("20260325234641_anyway")]
-    partial class anyway
+    [Migration("20260326172311_tablasdi")]
+    partial class tablasdi
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -205,7 +205,6 @@ namespace Raktarkezelo.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Note")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProductId")
@@ -272,7 +271,7 @@ namespace Raktarkezelo.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            Id = 2,
                             Email = "admin@raktar.hu",
                             IsActive = true,
                             Passwordhash = "JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=",
@@ -281,7 +280,7 @@ namespace Raktarkezelo.Migrations
                         },
                         new
                         {
-                            Id = 2,
+                            Id = 1,
                             Email = "manager@raktar.hu",
                             IsActive = true,
                             Passwordhash = "hmSFeWz6jXwM9xEWQCBbgwdkM1R1d1EdgfgDCumezqU=",

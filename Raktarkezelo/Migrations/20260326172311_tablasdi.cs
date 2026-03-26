@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Raktarkezelo.Migrations
 {
     /// <inheritdoc />
-    public partial class anyway : Migration
+    public partial class tablasdi : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -57,7 +57,7 @@ namespace Raktarkezelo.Migrations
                     UserId = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    Note = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -105,8 +105,8 @@ namespace Raktarkezelo.Migrations
                 columns: new[] { "Id", "Email", "IsActive", "Passwordhash", "Role", "Username" },
                 values: new object[,]
                 {
-                    { 1, "admin@raktar.hu", true, "JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=", 1, "admin" },
-                    { 2, "manager@raktar.hu", true, "hmSFeWz6jXwM9xEWQCBbgwdkM1R1d1EdgfgDCumezqU=", 2, "manager" }
+                    { 1, "manager@raktar.hu", true, "hmSFeWz6jXwM9xEWQCBbgwdkM1R1d1EdgfgDCumezqU=", 2, "manager" },
+                    { 2, "admin@raktar.hu", true, "JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=", 1, "admin" }
                 });
 
             migrationBuilder.CreateIndex(

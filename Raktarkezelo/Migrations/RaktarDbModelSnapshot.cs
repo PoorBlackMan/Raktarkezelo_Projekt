@@ -202,7 +202,6 @@ namespace Raktarkezelo.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Note")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ProductId")
@@ -269,7 +268,7 @@ namespace Raktarkezelo.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            Id = 2,
                             Email = "admin@raktar.hu",
                             IsActive = true,
                             Passwordhash = "JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=",
@@ -278,7 +277,7 @@ namespace Raktarkezelo.Migrations
                         },
                         new
                         {
-                            Id = 2,
+                            Id = 1,
                             Email = "manager@raktar.hu",
                             IsActive = true,
                             Passwordhash = "hmSFeWz6jXwM9xEWQCBbgwdkM1R1d1EdgfgDCumezqU=",

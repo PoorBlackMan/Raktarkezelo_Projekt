@@ -44,7 +44,7 @@ namespace Raktarkezelo.Data
             modelBuilder.Entity<Userinfo>().HasData(
                 new Userinfo
                 {
-                    Id = 1,
+                    Id = 2,
                     Email = "admin@raktar.hu",
                     Username = "admin",
                     Passwordhash = HashPassword("admin123"),
@@ -53,7 +53,7 @@ namespace Raktarkezelo.Data
                 },
                 new Userinfo
                 {
-                    Id = 2,
+                    Id = 1,
                     Email = "manager@raktar.hu",
                     Username = "manager",
                     Passwordhash = HashPassword("manager123"),

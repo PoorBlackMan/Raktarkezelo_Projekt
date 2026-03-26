@@ -16,22 +16,48 @@ namespace Raktarkezelo.Controllers
             _context = context;
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin,Manager,User")]
         public async Task<IActionResult> Main()
         {
-            var products = await _context.Products
-                .OrderBy(p => p.Name)
+            var products = await _context.Products.ToListAsync();
+
+            ViewBag.TotalProducts = products.Count;
+            ViewBag.LowStockCount = products.Count(p => p.Stock <= p.MinStock);
+
+            ViewBag.LastTransactions = await _context.StockTransactions
+                .Include(x => x.Product)
+                .OrderByDescending(x => x.CreatedAt)
+                .Take(5)
                 .ToListAsync();
 
             return View(products);
         }
 
         [Authorize]
-        public async Task<IActionResult> Products()
+        public async Task<IActionResult> Products(string search, string category, bool lowStockOnly = false)
         {
-            var products = await _context.Products
-                .OrderBy(p => p.Category)
-                .ThenBy(p => p.Name)
+            var query = _context.Products.AsQueryable();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                query = query.Where(p => p.Name.Contains(search));
+            }
+
+            if (!string.IsNullOrEmpty(category))
+            {
+                query = query.Where(p => p.Category == category);
+            }
+
+            if (lowStockOnly)
+            {
+                query = query.Where(p => p.Stock <= p.MinStock);
+            }
+
+            var products = await query.ToListAsync();
+
+            ViewBag.Categories = await _context.Products
+                .Select(p => p.Category)
+                .Distinct()
                 .ToListAsync();
 
             return View(products);
@@ -91,7 +117,7 @@ namespace Raktarkezelo.Controllers
         [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditProduct(ProductViewModel model)
+        public async Task<IActionResult> EditProduct(Products model)
         {
             if (!ModelState.IsValid)
                 return View(model);
@@ -100,14 +126,14 @@ namespace Raktarkezelo.Controllers
             if (product == null)
                 return NotFound();
 
-            product.Name = model.Name.Trim();
-            product.Category = model.Category.Trim();
-            product.Stock = model.Stock;
+            product.Name = model.Name;
+            product.Category = model.Category;
             product.MinStock = model.MinStock;
-            product.Note = model.Note?.Trim() ?? string.Empty;
+            product.Note = model.Note;
 
             await _context.SaveChangesAsync();
 
+            TempData["SuccessMessage"] = "A termék adatai sikeresen frissítve lettek.";
             return RedirectToAction(nameof(Products));
         }
 
@@ -120,10 +146,20 @@ namespace Raktarkezelo.Controllers
             if (product == null)
                 return NotFound();
 
+            bool hasTransactions = await _context.StockTransactions
+                .AnyAsync(x => x.ProductId == id);
+
+            if (hasTransactions)
+            {                                       
+                TempData["ErrorMessage"] = "A termék nem törölhető, mert már tartoznak hozzá készletmozgások.";
+                return RedirectToAction(nameof(Products));
+            }
+
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
 
+            TempData["SuccessMessage"] = "A termék sikeresen törölve lett.";
             return RedirectToAction(nameof(Products));
-        }
+        }           
     }
 }

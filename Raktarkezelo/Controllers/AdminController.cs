@@ -168,12 +168,11 @@ namespace Raktarkezelo.Controllers
             return View(model);
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Adjustments(AdjustmentViewModel model)
+        public async Task<IActionResult> Adjustment(AdjustmentViewModel model)
         {
-            model.Products = await GetProductsSelectList();
-
             if (!ModelState.IsValid)
             {
                 ViewBag.RecentTransactions = await GetRecentTransactions("ADJUST");
@@ -182,39 +181,40 @@ namespace Raktarkezelo.Controllers
 
             var product = await _context.Products.FindAsync(model.ProductId);
             if (product == null)
+                return NotFound();
+
+            int oldStock = product.Stock;
+            int newStock = model.NewQuantity;
+            int difference = newStock - oldStock;
+
+            if (difference == 0)
             {
-                ModelState.AddModelError("", "A kiválasztott termék nem található.");
+                ModelState.AddModelError("NewQuantity", "Az új készletérték nem tér el a jelenlegi készlettől.");
                 ViewBag.RecentTransactions = await GetRecentTransactions("ADJUST");
                 return View(model);
             }
 
-            var userId = GetCurrentUserId();
-            if (userId == null)
-                return Forbid();
+            product.Stock = newStock;
 
-            int difference = model.NewQuantity - product.Stock;
-            int loggedQuantity = Math.Abs(difference);
-
-            product.Stock = model.NewQuantity;
-
-            var transaction = new StockTransactions
+            _context.StockTransactions.Add(new StockTransactions
             {
                 ProductId = product.ProductId,
-                UserId = userId.Value,
+                UserId = int.Parse(User.FindFirst("UserId")!.Value),
                 Type = "ADJUST",
-                Quantity = loggedQuantity,
-                Note = model.Reason,
-                CreatedAt = DateTime.Now
-            };
+                Quantity = Math.Abs(difference),
+                CreatedAt = DateTime.Now,
+                Note = $"Korrigálva {oldStock}-ról {newStock}-ra"
+            });
 
-            _context.StockTransactions.Add(transaction);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Adjustments));
+            TempData["SuccessMessage"] = "A készletkorrekció sikeresen megtörtént.";
+            return RedirectToAction(nameof(Adjustment));
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [HttpGet]
-        public async Task<IActionResult> Reports(DateTime? fromDate, DateTime? toDate)
+        public async Task<IActionResult> Reports(DateTime? fromDate, DateTime? toDate, string? type, int? productId)
         {
             var query = _context.StockTransactions
                 .Include(x => x.Product)
@@ -222,17 +222,37 @@ namespace Raktarkezelo.Controllers
                 .AsQueryable();
 
             if (fromDate.HasValue)
+            {
                 query = query.Where(x => x.CreatedAt >= fromDate.Value.Date);
+            }
 
             if (toDate.HasValue)
+            {
                 query = query.Where(x => x.CreatedAt < toDate.Value.Date.AddDays(1));
+            }
+
+            if (!string.IsNullOrWhiteSpace(type))
+            {
+                query = query.Where(x => x.Type == type);
+            }
+
+            if (productId.HasValue)
+            {
+                query = query.Where(x => x.ProductId == productId.Value);
+            }
 
             var transactions = await query
                 .OrderByDescending(x => x.CreatedAt)
                 .ToListAsync();
 
-            ViewBag.FromDate = fromDate?.ToString("yyyy-MM-dd");
-            ViewBag.ToDate = toDate?.ToString("yyyy-MM-dd");
+            ViewBag.Products = await _context.Products
+                .OrderBy(p => p.Name)
+                .ToListAsync();
+
+            ViewBag.SelectedFromDate = fromDate?.ToString("yyyy-MM-dd");
+            ViewBag.SelectedToDate = toDate?.ToString("yyyy-MM-dd");
+            ViewBag.SelectedType = type;
+            ViewBag.SelectedProductId = productId;
 
             return View(transactions);
         }

@@ -184,15 +184,21 @@
             <h1>Main Page</h1>
             <div class="subtitle">Üdv a raktárkezelő rendszerben.</div>
 
-            <div class="grid">
-                <div class="stat-box">
-                    <div>Összes termék</div>
-                    <div class="stat-number">@Model.Count</div>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card p-3">
+                        <h5>Összes termék</h5>
+                        <h2>@ViewBag.TotalProducts</h2>
+                    </div>
                 </div>
-                <div class="stat-box">
-                    <div>Alacsony készlet</div>
-                    <div class="stat-number">@lowStockProducts.Count</div>
+
+                <div class="col-md-6">
+                    <div class="card p-3">
+                        <h5>Alacsony készlet</h5>
+                        <h2 class="text-warning">@ViewBag.LowStockCount</h2>
+                    </div>
                 </div>
+            </div>
                 <div class="stat-box">
                     <div>Bejelentkezve</div>
                     <div class="stat-number">@User.Identity?.Name</div>
@@ -231,6 +237,30 @@
                     <p>Nincs minimum alá csökkent termék.</p>
                 }
             </div>
+
+        <h4>Utolsó műveletek</h4>
+
+        <table class="table table-dark">
+            <thead>
+                <tr>
+                    <th>Termék</th>
+                    <th>Típus</th>
+                    <th>Mennyiség</th>
+                    <th>Dátum</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var t in ViewBag.LastTransactions)
+                {
+                    <tr>
+                        <td>@t.Product.Name</td>
+                        <td>@t.Type</td>
+                        <td>@t.Quantity</td>
+                        <td>@t.CreatedAt</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
 
             <div class="panel">
                 <h2>About</h2>

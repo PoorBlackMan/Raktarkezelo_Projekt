@@ -13,7 +13,7 @@ namespace Raktarkezelo
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddDbContext<RaktarDb>(options =>
-                options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Database=RaktarDb;Trusted_Connection=True;TrustServerCertificate=True"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>

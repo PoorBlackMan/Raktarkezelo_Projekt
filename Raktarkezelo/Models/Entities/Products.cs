@@ -7,19 +7,22 @@ namespace Raktarkezelo.Models.Entities
         [Key]
         public int ProductId { get; set; }
 
-        [Required]
-        public string Name { get; set; } = string.Empty;
+        [Required(ErrorMessage = "A név megadása kötelező.")]
+        [StringLength(100)]
+        public string Name { get; set; }
 
-        [Required]
-        public string Category { get; set; } = string.Empty;
+        [Required(ErrorMessage = "A kategória megadása kötelező.")]
+        [StringLength(50)]
+        public string Category { get; set; }
 
-        [Required]
+        [Range(0, int.MaxValue, ErrorMessage = "A készlet nem lehet negatív.")]
         public int Stock { get; set; }
 
-        [Required]
+        [Range(0, int.MaxValue, ErrorMessage = "A minimum készlet nem lehet negatív.")]
         public int MinStock { get; set; }
 
-        public string Note { get; set; } = string.Empty;
+        [StringLength(250)]
+        public string? Note { get; set; }
 
         public ICollection<StockTransactions> StockTransactions { get; set; } = new List<StockTransactions>();
     }

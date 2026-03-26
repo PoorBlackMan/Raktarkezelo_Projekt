@@ -9,6 +9,7 @@ namespace Raktarkezelo.Models.User
         public string Email { get; set; } = string.Empty;
 
         [Required]
+        [StringLength(50)]
         public string Username { get; set; } = string.Empty;
 
         [Required]
@@ -17,7 +18,7 @@ namespace Raktarkezelo.Models.User
         public string Password { get; set; } = string.Empty;
 
         [Required]
-        [Compare("Password")]
+        [Compare("Password", ErrorMessage = "A jelszavak nem egyeznek.")]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; } = string.Empty;
     }

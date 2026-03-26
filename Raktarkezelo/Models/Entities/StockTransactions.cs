@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Raktarkezelo.Models.Entities
 {
@@ -9,19 +10,23 @@ namespace Raktarkezelo.Models.Entities
 
         [Required]
         public int ProductId { get; set; }
+        [ForeignKey("ProductId")]
         public Products Product { get; set; } = null!;
 
         [Required]
         public int UserId { get; set; }
+
+        [ForeignKey("UserId")]
         public Userinfo User { get; set; } = null!;
 
         [Required]
-        public string Type { get; set; } = "IN";
+        public string Type { get; set; }
 
         [Required]
+        [Range(1, int.MaxValue)]
         public int Quantity { get; set; }
 
-        public string Note { get; set; } = string.Empty;
+        public string? Note { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
     }
