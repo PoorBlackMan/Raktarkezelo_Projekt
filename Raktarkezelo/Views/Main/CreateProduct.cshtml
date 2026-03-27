@@ -1,0 +1,58 @@
+﻿@model Raktarkezelo.Models.Viewmodel.ProductViewModel
+
+@{
+    ViewData["Title"] = "Create Product";
+}
+
+<div class="container py-4" style="max-width: 650px;">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="mb-4">Új termék</h2>
+
+            <form asp-action="CreateProduct" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="text-danger mb-3">
+                    @Html.ValidationSummary(false)
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Category" class="form-label"></label>
+                    <input asp-for="Category" class="form-control" />
+                    <span asp-validation-for="Category" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Stock" class="form-label"></label>
+                    <input asp-for="Stock" class="form-control" />
+                    <span asp-validation-for="Stock" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="MinStock" class="form-label"></label>
+                    <input asp-for="MinStock" class="form-control" />
+                    <span asp-validation-for="MinStock" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Note" class="form-label"></label>
+                    <textarea asp-for="Note" class="form-control"></textarea>
+                    <span asp-validation-for="Note" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Mentés</button>
+                <a asp-action="Products" class="btn btn-secondary">Vissza</a>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

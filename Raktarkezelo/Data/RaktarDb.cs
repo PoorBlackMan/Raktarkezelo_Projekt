@@ -1,5 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Raktarkezelo.Models.Entities;
+using Raktarkezelo.Models.Enums;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Raktarkezelo.Data
 {
@@ -36,20 +39,58 @@ namespace Raktarkezelo.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<StockTransactions>()
-                 .ToTable(t => t.HasCheckConstraint("CK_StockTransactions_Type", "[Type] IN ('IN','OUT','ADJUST')"));
+                .ToTable(t => t.HasCheckConstraint("CK_StockTransactions_Type", "[Type] IN ('IN','OUT','ADJUST')"));
 
             modelBuilder.Entity<Userinfo>().HasData(
                 new Userinfo
                 {
-                    Id = 999,
-                    Email = "admin@gmail.com",
-                    Username = "defaultadmin",
-                    Role = Models.Enums.UserRole.Admin,
-                    Passwordhash = "adminkarakter",
-                    ConfirmPassword = "adminkarakter",
+                    Id = 2,
+                    Email = "admin@raktar.hu",
+                    Username = "admin",
+                    Passwordhash = HashPassword("admin123"),
+                    Role = UserRole.Admin,
+                    IsActive = true
+                },
+                new Userinfo
+                {
+                    Id = 1,
+                    Email = "manager@raktar.hu",
+                    Username = "manager",
+                    Passwordhash = HashPassword("manager123"),
+                    Role = UserRole.Manager,
                     IsActive = true
                 }
             );
+
+            modelBuilder.Entity<Products>().HasData(
+                new Products { ProductId = 1, Name = "Coca-Cola 0.5L", Category = "Üdítő", Stock = 50, MinStock = 10 },
+                new Products { ProductId = 2, Name = "Fanta 0.5L", Category = "Üdítő", Stock = 40, MinStock = 10 },
+                new Products { ProductId = 3, Name = "Ásványvíz 1.5L", Category = "Üdítő", Stock = 60, MinStock = 15 },
+
+                new Products { ProductId = 4, Name = "Golyóstoll kék", Category = "Írószer", Stock = 100, MinStock = 20 },
+                new Products { ProductId = 5, Name = "Ceruza HB", Category = "Írószer", Stock = 80, MinStock = 20 },
+                new Products { ProductId = 6, Name = "A4 füzet", Category = "Írószer", Stock = 35, MinStock = 10 },
+
+                new Products { ProductId = 7, Name = "Toalettpapír", Category = "Háztartás", Stock = 25, MinStock = 8 },
+                new Products { ProductId = 8, Name = "Papírtörlő", Category = "Háztartás", Stock = 20, MinStock = 6 },
+                new Products { ProductId = 9, Name = "Mosogatószer", Category = "Háztartás", Stock = 18, MinStock = 5 },
+
+                new Products { ProductId = 10, Name = "Sebtapasz", Category = "Egészségügy", Stock = 30, MinStock = 10 },
+                new Products { ProductId = 11, Name = "Kézfertőtlenítő", Category = "Egészségügy", Stock = 22, MinStock = 8 },
+                new Products { ProductId = 12, Name = "Maszk", Category = "Egészségügy", Stock = 100, MinStock = 25 },
+
+                new Products { ProductId = 13, Name = "Elem AA", Category = "Elektronika", Stock = 45, MinStock = 12 },
+                new Products { ProductId = 14, Name = "USB kábel", Category = "Elektronika", Stock = 28, MinStock = 8 },
+                new Products { ProductId = 15, Name = "Hosszabbító", Category = "Elektronika", Stock = 12, MinStock = 4 }
+            );
+        }
+
+        private static string HashPassword(string password)
+        {
+            using var sha256 = SHA256.Create();
+            var bytes = Encoding.UTF8.GetBytes(password);
+            var hash = sha256.ComputeHash(bytes);
+            return Convert.ToBase64String(hash);
         }
     }
 }

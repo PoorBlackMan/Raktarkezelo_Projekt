@@ -1,27 +1,49 @@
-﻿@{
+﻿@model List<Raktarkezelo.Models.Entities.Userinfo>
+
+@{
     ViewData["Title"] = "Users";
 }
 
-<h1>User Management</h1>
+<div class="container py-4">
+    <h1>User Management</h1>
 
-<a href="#">+ Add New User</a>
+    <table class="table table-dark table-striped table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Username</td>
+                    <td>@item.Email</td>
+                    <td>@item.Role</td>
+                    <td>@(item.IsActive ? "Active" : "Inactive")</td>
+                    <td>
+                        @if (item.Role != Raktarkezelo.Models.Enums.UserRole.Admin)
+                        {
+                            <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm @(item.IsActive ? "btn-danger" : "btn-success")">
+                                    @(item.IsActive ? "Disable" : "Enable")
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <span class="text-warning">Admin nem tiltható</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
-<hr />
-
-<table border="1" cellpadding="5">
-    <tr>
-        <th>Username</th>
-        <th>Role</th>
-        <th>Status</th>
-        <th>Actions</th>
-    </tr>
-    <tr>
-        <td>admin</td>
-        <td>Administrator</td>
-        <td>Active</td>
-        <td>
-            <a href="#">Edit</a> |
-            <a href="#">Disable</a>
-        </td>
-    </tr>
-</table>
+    <a asp-controller="Main" asp-action="Main" class="btn btn-secondary">Vissza</a>
+</div>

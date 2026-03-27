@@ -1,27 +1,99 @@
-﻿@{
+﻿@model List<Raktarkezelo.Models.Entities.Products>
+
+@{
     ViewData["Title"] = "Products";
 }
 
-<h1>Products</h1>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Termékek</h1>
 
-<a href="#">+ Add New Product</a>
+        @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+        {
+            <a asp-action="CreateProduct" class="btn btn-primary">+ Add New Product</a>
+        }
+    </div>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
 
-<hr />
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    <form method="get" class="row g-2 mb-3">
 
-<table border="1" cellpadding="5">
-    <tr>
-        <th>Name</th>
-        <th>Unit</th>
-        <th>Min Stock</th>
-        <th>Actions</th>
-    </tr>
-    <tr>
-        <td>Sample Product</td>
-        <td>pcs</td>
-        <td>10</td>
-        <td>
-            <a href="#">Edit</a> |
-            <a href="#">Delete</a>
-        </td>
-    </tr>
-</table>
+        <div class="col-md-4">
+            <input type="text" name="search" class="form-control" placeholder="Keresés név alapján..." value="@Context.Request.Query["search"]" />
+        </div>
+
+        <div class="col-md-3">
+            <select name="category" class="form-select">
+                <option value="">-- Összes kategória --</option>
+                @foreach (var cat in ViewBag.Categories)
+                {
+                    <option value="@cat" selected="@(Context.Request.Query["category"] == cat)">
+                        @cat
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2 form-check mt-2">
+            <input type="checkbox" name="lowStockOnly" value="true" class="form-check-input"
+                   @(Context.Request.Query["lowStockOnly"] == "true" ? "checked" : "") />
+            <label class="form-check-label">Alacsony készlet</label>
+        </div>
+
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100">Szűrés</button>
+        </div>
+
+    </form>
+    <table class="table table-dark table-striped table-bordered align-middle">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Stock</th>
+                <th>Min Stock</th>
+                <th>Note</th>
+                @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                {
+                    <th>Actions</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="@(item.Stock <= item.MinStock ? "table-warning" : "")">
+                    <td>@item.Name</td>
+                    <td>@item.Category</td>
+                    <td>@item.Stock</td>
+                    <td>@item.MinStock</td>
+                    <td>@item.Note</td>
+
+                    @if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+                    {
+                        <td>
+                            <a asp-action="EditProduct" asp-route-id="@item.ProductId" class="btn btn-sm btn-warning">Edit</a>
+
+                            <form asp-action="DeleteProduct" asp-route-id="@item.ProductId" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Biztos törlöd?')">Delete</button>
+                            </form>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a asp-action="Main" class="btn btn-secondary">Vissza</a>
+</div>

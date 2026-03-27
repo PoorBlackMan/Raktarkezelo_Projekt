@@ -1,44 +1,75 @@
-﻿@{
+﻿@model Raktarkezelo.Models.Viewmodel.StockTransactionViewModel
+@using Raktarkezelo.Models.Entities
+
+@{
     ViewData["Title"] = "Inbound";
+    var transactions = ViewBag.RecentTransactions as List<StockTransactions> ?? new List<StockTransactions>();
 }
 
-<h1>Inbound</h1>
+<div class="container py-4">
+    <h1>Inbound</h1>
 
-<form method="post">
-    <div>
-        <label>Product:</label>
-        <select>
-            <option>Product 1</option>
-            <option>Product 2</option>
-        </select>
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form asp-action="Inbound" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="text-danger mb-3">
+                    @Html.ValidationSummary(false)
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="ProductId" class="form-label">Product</label>
+                    <select asp-for="ProductId" asp-items="Model.Products" class="form-select">
+                        <option value="">-- Válassz terméket --</option>
+                    </select>
+                    <span asp-validation-for="ProductId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Quantity" class="form-label">Quantity</label>
+                    <input asp-for="Quantity" class="form-control" />
+                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Note" class="form-label">Megjegyzés</label>
+                    <input asp-for="Note" class="form-control" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a asp-controller="Main" asp-action="Main" class="btn btn-secondary">Vissza</a>
+            </form>
+        </div>
     </div>
 
-    <div>
-        <label>Quantity:</label>
-        <input type="number" />
-    </div>
+    <h3>Recent Inbound Transactions</h3>
 
-    <div>
-        <label>Date:</label>
-        <input type="date" />
-    </div>
+    <table class="table table-dark table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Quantity</th>
+                <th>User</th>
+                <th>Note</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in transactions)
+            {
+                <tr>
+                    <td>@item.Product.Name</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.User.Username</td>
+                    <td>@item.Note</td>
+                    <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
-    <button type="submit">Save</button>
-</form>
-
-<hr />
-
-<h3>Recent Inbound Transactions</h3>
-
-<table border="1" cellpadding="5">
-    <tr>
-        <th>Product</th>
-        <th>Quantity</th>
-        <th>Date</th>
-    </tr>
-    <tr>
-        <td>Sample</td>
-        <td>10</td>
-        <td>2026-02-26</td>
-    </tr>
-</table>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

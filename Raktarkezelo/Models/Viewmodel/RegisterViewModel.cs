@@ -4,20 +4,21 @@ namespace Raktarkezelo.Models.User
 {
     public class RegisterViewModel
     {
-        [Required(ErrorMessage = "Email megadása kötelező")]
-        [EmailAddress(ErrorMessage = "Helytelen email formátum")]
+        [Required]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Felhasználónév megadása kötelező")]
+        [Required]
+        [StringLength(50)]
         public string Username { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Jelszó megadása kötelező")]
-        [MinLength(8, ErrorMessage = "A jelszónak legalább 8 karakter hosszúnak kell lennie")]
+        [Required]
+        [MinLength(8)]
         [DataType(DataType.Password)]
         public string Password { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "A jelszó megerősítése kötelező")]
-        [Compare("Password", ErrorMessage = "A két jelszó nem egyezik")]
+        [Required]
+        [Compare("Password", ErrorMessage = "A jelszavak nem egyeznek.")]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; } = string.Empty;
     }

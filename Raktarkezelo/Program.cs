@@ -13,14 +13,13 @@ namespace Raktarkezelo
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddDbContext<RaktarDb>(options =>
-                options.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Database=RaktarDb;Trusted_Connection=True"));
+                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // 🔐 AUTHENTICATION
             builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
                     options.LoginPath = "/RegLog/Login";
-                    options.AccessDeniedPath = "/Main/Main";
+                    options.AccessDeniedPath = "/Home/AccessDenied";
                 });
 
             builder.Services.AddAuthorization();
@@ -38,7 +37,6 @@ namespace Raktarkezelo
 
             app.UseRouting();
 
-            // FONTOS SORREND
             app.UseAuthentication();
             app.UseAuthorization();
 
