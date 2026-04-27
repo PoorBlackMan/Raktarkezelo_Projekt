@@ -1,0 +1,144 @@
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    bool isAdmin = User.IsInRole("Admin");
+    bool isManager = User.IsInRole("Manager");
+    var username = User.Identity?.Name ?? "";
+    var initial = username.Length > 0 ? username[0].ToString().ToUpper() : "?";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+    .sidebar { width: 240px; background: var(--nav-bg); border-right: 1px solid var(--nav-border); padding: 20px 15px; flex: 0 0 240px; display: flex; flex-direction: column; }
+    .sidebar-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; }
+    .brand { font-size: 17px; font-weight: bold; color: var(--text-primary); }
+    .menu-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; margin-top: 4px; }
+    .navlist { list-style: none; padding: 0; margin: 0; flex: 1; }
+    .navlist li { margin-bottom: 4px; }
+    .navlink { text-decoration: none; color: var(--nav-link); font-weight: 500; display: block; padding: 7px 10px; border-radius: 6px; transition: background 0.15s; }
+    .navlink:hover { background: var(--row-stripe); color: var(--text-primary); }
+    .navlink.active { background: var(--nav-active-bg); color: var(--nav-active-fg); }
+    .navhint { font-size: 11px; color: var(--text-muted); padding: 0 10px 4px; }
+    .nav-divider { border-top: 1px solid var(--border-color); margin: 10px 0; }
+    .nav-logout { margin-top: auto; }
+    .navlink.logout { color: var(--text-muted); }
+    .navlink.logout:hover { background: rgba(248,113,113,0.12); color: var(--clr-danger); }
+    /* Profile avatar */
+    .profile-avatar { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#1e3a5f,#0d6efd); display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; color:#fff; text-decoration:none; flex-shrink:0; transition:opacity .15s; }
+    .profile-avatar:hover { opacity:.8; }
+    /* Hamburger for mobile */
+    .hamburger { display:none; background:none; border:none; color:var(--nav-link); font-size:22px; cursor:pointer; padding:4px 8px; }
+    @@media(max-width:768px){
+        .sidebar { width:100%; flex-direction:column; border-right:none; border-bottom:1px solid var(--nav-border); padding:14px 15px; }
+        .hamburger { display:block; }
+        .sidebar-nav { display:none; }
+        .sidebar-nav.open { display:block; }
+        .nav-logout { margin-top:8px; }
+    }
+</style>
+
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <div class="brand">Raktárkezelő</div>
+        <div class="d-flex align-items-center gap-2">
+            <a asp-controller="Profile" asp-action="Index"
+               class="profile-avatar"
+               title="@username — Profil">@initial</a>
+            <button class="hamburger" onclick="toggleSidebar()" aria-label="Menü">☰</button>
+        </div>
+    </div>
+
+    <div class="sidebar-nav" id="sidebarNav">
+        <div class="menu-title">Navigáció</div>
+        <ul class="navlist">
+            <li>
+                <a asp-controller="Main" asp-action="Main"
+                   class="navlink @(currentController=="Main"&&currentAction=="Main"?"active":"")">
+                    <i class="bi bi-house"></i> Főoldal
+                </a>
+            </li>
+            <li>
+                <a asp-controller="Main" asp-action="Products"
+                   class="navlink @(currentController=="Main"&&currentAction=="Products"?"active":"")">
+                    <i class="bi bi-box-seam"></i> Termékek
+                </a>
+            </li>
+
+            @if (isAdmin || isManager)
+            {
+                <div class="nav-divider"></div>
+                <div class="menu-title">Készletkezelés</div>
+                <li>
+                    <a asp-controller="Admin" asp-action="Inbound"
+                       class="navlink @(currentController=="Admin"&&currentAction=="Inbound"?"active":"")">
+                         <i class="bi bi-database-add"></i> Bevételezés
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Admin" asp-action="Outbound"
+                       class="navlink @(currentController=="Admin"&&currentAction=="Outbound"?"active":"")">
+                         <i class="bi bi-database-dash"></i> Kiadás
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Admin" asp-action="Adjustments"
+                       class="navlink @(currentController=="Admin"&&currentAction=="Adjustments"?"active":"")">
+                         <i class="bi bi-wrench"></i> Korrekció
+                    </a>
+                </li>
+                <li>
+                    <a asp-controller="Admin" asp-action="Reports"
+                       class="navlink @(currentController=="Admin"&&currentAction=="Reports"?"active":"")">
+                         <i class="bi bi-megaphone"></i> Riportok
+                    </a>
+                </li>
+            }
+
+            @if (isAdmin || isManager)
+            {
+                <div class="nav-divider"></div>
+                <div class="menu-title">@(isManager ? "Felhasználókezelés" : "Felhasználók")</div>
+                <li>
+                    <a asp-controller="Manager" asp-action="Users"
+                       class="navlink @(currentController=="Manager"&&currentAction=="Users"?"active":"")">
+                         <i class="bi bi-people"></i> Felhasználók
+                    </a>
+                    @if (!isManager) { <div class="navhint">Csak megtekintés</div> }
+                </li>
+                @if (isManager)
+                {
+                    <li>
+                        <a asp-controller="Manager" asp-action="AuditLog"
+                           class="navlink @(currentController=="Manager"&&currentAction=="AuditLog"?"active":"")">
+                             <i class="bi bi-person-badge"></i> Tevékenységnapló
+                        </a>
+                    </li>
+                }
+            }
+
+            <div class="nav-divider"></div>
+            <li class="nav-logout">
+                <a asp-controller="RegLog" asp-action="Logout" class="navlink logout">
+                     <i class="bi bi-door-open"></i> Kilépés
+                </a>
+            </li>
+        </ul>
+    </div>
+</aside>
+
+<script>
+function toggleSidebar() {
+    const nav = document.getElementById('sidebarNav');
+    nav.classList.toggle('open');
+}
+(function() {
+    function checkWidth() {
+        const nav = document.getElementById('sidebarNav');
+        if (window.innerWidth > 768) nav.classList.add('open');
+        else nav.classList.remove('open');
+    }
+    checkWidth();
+    window.addEventListener('resize', checkWidth);
+})();
+</script>

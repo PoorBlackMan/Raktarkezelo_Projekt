@@ -1,0 +1,93 @@
+﻿@{
+    ViewData["Title"] = "Kezdőlap";
+}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+    body {
+        background-color: black;
+    }
+
+    .main {
+        background: radial-gradient(circle,rgba(23, 26, 28, 1) 0%, rgba(0, 0, 0, 1) 100%);
+        border:  solid #171a1c;
+        width:30%;
+        height:60%;
+
+
+        margin: auto;
+
+        top:0;
+        left:0;
+        bottom:0;
+        right:0;
+
+        position:absolute;
+
+        border-radius: 5%;
+        padding: 1%;
+
+        color:white;
+
+        text-align:center;
+        box-shadow: #171a1c 0px 50px 100px -20px, #171a1c 0px 30px 60px -30px;
+    }
+
+    img {
+        margin:auto;
+    }
+
+    a {
+        width:50%;
+        margin-bottom: 5%;
+    }
+
+    p {
+        font-size: 30px;
+        font-family:Arial;
+        font-weight:bold;
+    }
+
+    img {
+        width: 40%;
+        height: 30%;
+    }
+
+    .dark-mode {
+        background-color: black;
+        color:white
+    }
+
+    .btn-darkgradient {
+      color: #fff;
+      background: radial-gradient(circle,rgba(23, 26, 28, 1) 0%, rgba(5, 5, 5, 1) 100%);
+      border-color: #212529;
+    }
+    .btn-darkgradient:hover {
+      color: #fff;
+      background-color: #1c1f23;
+      border-color: #1a1e21;
+    }
+
+</style>
+
+<div class="main">
+
+    <p style="font-family:">Raktárkezelő Projekt</p>
+
+    <hr/>
+
+    <br />
+
+    <img src="/Source/Logo.png" alt="Logo" />
+    <br />
+    <br />
+    
+    <a class="btn btn-darkgradient" style="font-weight:bold" asp-controller="RegLog" asp-action="Login">
+        <i class="bi bi-file-person-fill"></i>
+        Bejelentkezés
+    </a>
+    <a class="btn btn-darkgradient" style="font-weight:bold" asp-controller="RegLog" asp-action="Register">
+        <i class="bi bi-file-person-fill"></i>
+        Regisztráció
+    </a>
+</div>

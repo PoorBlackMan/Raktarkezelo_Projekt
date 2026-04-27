@@ -1,0 +1,197 @@
+@model Raktarkezelo.Models.Viewmodel.LoginViewModel
+@{
+    ViewData["Title"] = "Bejelentkezés";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+
+<style>
+
+    body {
+        background: linear-gradient(180deg,rgba(23, 26, 28, 1) 0%, rgba(0, 0, 0, 1) 100%);
+    }
+
+    .main {
+        background: radial-gradient(circle,rgba(23, 26, 28, 1) 0%, rgba(0, 0, 0, 1) 100%);
+        animation-name: myAnimation;    
+        border: solid #171a1c;
+        width: 30%;
+        height: 60%;
+        margin: auto;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        position: absolute;
+        border-radius: 5%;
+        padding: 1%;
+        color: white;
+        text-align: center;
+        box-shadow: #171a1c 0px 50px 100px -20px, #171a1c 0px 30px 60px -30px;
+    }
+
+     .btn-darkgradient {
+      color: #fff;
+      background: radial-gradient(circle,rgba(23, 26, 28, 1) 0%, rgba(5, 5, 5, 1) 100%);
+      border-color: #212529;
+    }
+    .btn-darkgradient:hover {
+      color: #fff;
+      background-color: #1c1f23;
+      border-color: #1a1e21;
+    }
+
+    img {
+        width: 40%;
+        height: 30%;
+    }
+
+     p {
+        font-size: 30px;
+        font-family:Arial;
+        font-weight:bold;
+    }
+
+    .form-label {
+        color:var(--text-muted);
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+
+    .form-control {
+        background:var(--bg-input);
+        border:1px solid var(--border-input);
+        color:var(--text-primary);
+        border-radius: 7px;
+    }
+
+    .form-control:focus {
+        background:var(--bg-input);
+        color:var(--text-primary);
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13,110,253,.2);
+    }
+
+    .form-control::placeholder {
+        color: #555;
+    }
+
+    #alertbox {
+        visibility: hidden;
+        background-color: rgba(23, 26, 28, 1);
+        border: solid 3px rgba(181, 178, 178, 0.8);
+        font-weight: bold;
+        color: white;
+        text-align: center;
+        width:20%;
+        height:15%;
+        align-items:center;
+        justify-content: center;
+        display: flex;
+        margin: auto;
+        font-size: 15px;
+    }
+
+    #alertbox.alert {
+        visibility: visible;
+        animation: slidein 4.5s ease-in-out;
+
+    }
+
+    @@keyframes slidein {
+        0% {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+        50% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        85% {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        100% {
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+    }
+</style> 
+
+<script>
+    document.addEventListener("DOMContentLoaded",function() {
+         
+        var alertbox = document.getElementById("alertbox");
+       
+        var gomb = document.getElementById("gomb")
+    
+
+    gomb.addEventListener("click",function() {
+        let hiba1 = document.getElementById("hiba1").value
+        let passwordhiba = document.getElementById("passwordhiba").value
+
+        var hibak = []
+        
+
+        if(hiba1 == "") {
+            hibak.push("Az email cím megadása kötelező!")
+        }
+        if(passwordhiba == "") {
+            hibak.push("A jelszó megadása kötelező!")
+        }
+
+        if (hibak != "") {
+        console.log(hibak)
+        alertbox.innerText = "HIBA: \n " + hibak[0] + "\n" + hibak[1]
+        alertbox.className = "alert";
+        setTimeout(function(){alertbox.className = alertbox.className.replace("alert",""); }, 4500);
+        }
+        
+    })})
+
+</script>
+
+<div id="alertbox">Szoveg</div>
+
+<div class="main" id="main">
+    <p>Bejelentkezés</p>
+    <img src="/Source/Logo.png" alt="logo"/>
+    <form asp-action="Login" method="post">
+        @Html.AntiForgeryToken()
+
+        @* Global errors (lockout, wrong credentials) *@
+        @if (!ViewData.ModelState.IsValid && ViewData.ModelState[""] != null)
+        {
+            <div class="global-error">
+                @foreach (var err in ViewData.ModelState[""]!.Errors)
+                {
+                    <div>@err.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label">Email cím</label>
+            <input asp-for="Email" class="form-control" id="hiba1" placeholder="google@gmail.com"  autocomplete="email" />
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="Password" class="form-label">Jelszó</label>
+            <input asp-for="Password" id="passwordhiba" class="form-control" placeholder="••••••••" type="password" autocomplete="current-password" />
+        </div>
+
+
+        <button id="gomb" type="submit" class="btn btn-darkgradient">
+              <i class="bi bi-door-open"></i>
+              Bejelentkezés</button>
+    </form>
+    <br />
+    <div class="register-link">
+        Még nincs fiókod? <a asp-controller="RegLog" asp-action="Register">Regisztrálj</a>
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

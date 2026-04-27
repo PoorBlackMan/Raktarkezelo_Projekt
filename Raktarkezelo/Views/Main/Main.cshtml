@@ -1,0 +1,149 @@
+@model List<Raktarkezelo.Models.Entities.Products>
+@{
+    ViewData["Title"] = "Főoldal";
+    var lowStockProducts = Model.Where(p => p.Stock <= p.MinStock).ToList();
+}
+<style>
+    .page { min-height:100vh; background:var(--bg-main); color:var(--text-primary); display:flex; font-family:Arial,Helvetica,sans-serif; }
+    .content { flex:1; padding:40px; overflow-y:auto; }
+    .wrap { max-width:1100px; margin:0 auto; }
+    .subtitle { color:var(--text-muted); margin-bottom:28px; font-size:14px; }
+    .stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; margin-bottom:28px; }
+    .stat-box { background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:20px 24px; }
+    .stat-label { font-size:13px; color:var(--text-muted); margin-bottom:6px; }
+    .stat-number { font-size:28px; font-weight:bold; }
+    .panel { background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:24px; margin-bottom:24px; }
+    .panel h2 { font-size:18px; margin-bottom:16px; }
+    .charts-grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px; }
+    .chart-box { background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:20px; }
+    .chart-box h3 { font-size:15px; color:var(--text-muted); margin-bottom:14px; }
+    .warning-table { width:100%; border-collapse:collapse; font-size:14px; }
+    .warning-table th,.warning-table td { border:1px solid #333; padding:10px 12px; }
+    .warning-table th { background:var(--bg-surface); color:#bbb; font-weight:600; }
+    @@media(max-width:900px){ .charts-grid{grid-template-columns:1fr;} .stats-grid{grid-template-columns:1fr;} }
+    @@media(max-width:768px){ .page{flex-direction:column;} .content{padding:20px;} }
+</style>
+<div class="page">
+    @await Html.PartialAsync("_Sidebar")
+    <main class="content">
+        <div class="wrap">
+            <h1>Főoldal</h1>
+            <div class="subtitle">Üdvözöljük a raktárkezelő rendszerben, <strong>@User.Identity?.Name</strong>!</div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">Összes termék</div>
+                    <div class="stat-number">@ViewBag.TotalProducts</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Alacsony készlet</div>
+                    <div class="stat-number" style="color:var(--clr-warning);">@ViewBag.LowStockCount</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Összesített készlet</div>
+                    <div class="stat-number">@Model.Sum(p => p.Stock)</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-box">
+                    <h3>📊 Készlet kategóriánként</h3>
+                    <canvas id="barChart" height="200"></canvas>
+                </div>
+                <div class="chart-box">
+                    <h3>🥧 Megoszlás</h3>
+                    <canvas id="pieChart" height="200"></canvas>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>⚠️ Alacsony készletszint</h2>
+                @if (lowStockProducts.Any())
+                {
+                    <table class="warning-table">
+                        <thead><tr><th>Termék</th><th>Kategória</th><th>Készlet</th><th>Minimum</th></tr></thead>
+                        <tbody>
+                            @foreach (var item in lowStockProducts)
+                            {
+                                <tr>
+                                    <td>@item.Name</td>
+                                    <td>@item.Category</td>
+                                    <td style="color:var(--clr-danger);font-weight:bold;">@item.Stock</td>
+                                    <td>@item.MinStock</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else { <p style="color:var(--clr-success);">✓ Minden termék készlete megfelelő szinten van.</p> }
+            </div>
+
+            <div class="panel">
+                <h2>🕐 Utolsó műveletek</h2>
+                <table class="warning-table">
+                    <thead><tr><th>Termék</th><th>Típus</th><th>Mennyiség</th><th>Dátum</th></tr></thead>
+                    <tbody>
+                        @foreach (var t in ViewBag.LastTransactions)
+                        {
+                            <tr>
+                                <td>@t.Product.Name</td>
+                                <td>
+                                    @if (t.Type=="IN"){ <span style="color:var(--clr-success)">Bevételezés</span> }
+                                    else if (t.Type=="OUT"){ <span style="color:var(--clr-danger)">Kiadás</span> }
+                                    else { <span style="color:#facc15">Korrekció</span> }
+                                </td>
+                                <td>@t.Quantity</td>
+                                <td>@t.CreatedAt.ToString("yyyy.MM.dd HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    const labels = @Html.Raw(ViewBag.ChartLabels);
+    const values = @Html.Raw(ViewBag.ChartValues);
+
+    const palette = ['#60a5fa','#4ade80','#facc15','#f87171','#c084fc','#fb923c','#34d399','#f472b6'];
+
+    new Chart(document.getElementById('barChart'), {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Készletmennyiség',
+                data: values,
+                backgroundColor: palette,
+                borderRadius: 6,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#888' }, grid: { color: getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim() || '#2a2a2a' } },
+                y: { ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#888' }, grid: { color: getComputedStyle(document.documentElement).getPropertyValue('--border-color').trim() || '#2a2a2a' } }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('pieChart'), {
+        type: 'doughnut',
+        data: {
+            labels,
+            datasets: [{ data: values, backgroundColor: palette, borderColor: '#1c1c1c', borderWidth: 3 }]
+        },
+        options: {
+            plugins: {
+                legend: { position: 'right', labels: { color: '#ccc', padding: 14, font: { size: 12 } } }
+            }
+        }
+    });
+</script>
+}

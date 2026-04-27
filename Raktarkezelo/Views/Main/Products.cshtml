@@ -1,0 +1,116 @@
+@model List<Raktarkezelo.Models.Entities.Products>
+
+@{
+    ViewData["Title"] = "Termékek";
+    bool canEdit = User.IsInRole("Admin") || User.IsInRole("Manager");
+}
+
+<style>
+    .page { min-height: 100vh; background:var(--bg-main); color:var(--text-primary); display: flex; font-family: Arial, Helvetica, sans-serif; }
+    .content { flex: 1; padding: 40px; overflow-y: auto; }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    .form-control, .form-select { background:var(--bg-input); border:1px solid var(--border-input); color:var(--text-primary); }
+    .form-control:focus, .form-select:focus { background:var(--bg-input); color:var(--text-primary); border-color: #0d6efd; box-shadow: none; }
+    .form-control::placeholder { color: #555; }
+    .form-check-label { color: #ccc; }
+    @@media (max-width: 768px) { .page { flex-direction: column; } .content { padding: 20px; } }
+</style>
+
+<div class="page">
+    @await Html.PartialAsync("_Sidebar")
+
+    <main class="content">
+        <div class="wrap">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1>Termékek</h1>
+                @if (canEdit)
+                {
+                    <a asp-action="CreateProduct" class="btn btn-primary">+ Új termék</a>
+                }
+            </div>
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <form method="get" class="row g-2 mb-3">
+                <div class="col-md-4">
+                    <input type="text" name="search" class="form-control" placeholder="Keresés név alapján..."
+                           value="@Context.Request.Query["search"]" />
+                </div>
+                <div class="col-md-3">
+                    <select name="category" class="form-select">
+                        <option value="">-- Összes kategória --</option>
+                        @foreach (var cat in ViewBag.Categories)
+                        {
+                            <option value="@cat" selected="@(Context.Request.Query["category"] == cat)">@cat</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-center gap-2">
+                    <input type="checkbox" name="lowStockOnly" value="true" class="form-check-input"
+                           id="lowStockOnly"
+                           @(Context.Request.Query["lowStockOnly"] == "true" ? "checked" : "") />
+                    <label class="form-check-label" for="lowStockOnly">Alacsony készlet</label>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">Szűrés</button>
+                </div>
+            </form>
+
+            <table class="table table-dark table-striped table-bordered align-middle">
+                <thead>
+                    <tr>
+                        <th>Megnevezés</th>
+                        <th>Kategória</th>
+                        <th>Készlet</th>
+                        <th>Min. készlet</th>
+                        <th>Megjegyzés</th>
+                        @if (canEdit)
+                        {
+                            <th>Műveletek</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="@(item.Stock <= item.MinStock ? "table-warning" : "")">
+                            <td>@item.Name</td>
+                            <td>@item.Category</td>
+                            <td>@item.Stock</td>
+                            <td>@item.MinStock</td>
+                            <td>@item.Note</td>
+                            @if (canEdit)
+                            {
+                                <td class="d-flex gap-1">
+                                    <a asp-action="EditProduct" asp-route-id="@item.ProductId"
+                                       class="btn btn-sm btn-warning">Szerkesztés</a>
+                                    <form asp-action="DeleteProduct" asp-route-id="@item.ProductId"
+                                          method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-danger"
+                                                onclick="return confirm('Biztosan törlöd a(z) \'@item.Name\' terméket?')">
+                                            Törlés
+                                        </button>
+                                    </form>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>

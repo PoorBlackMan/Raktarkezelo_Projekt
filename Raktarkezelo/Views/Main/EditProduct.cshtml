@@ -1,0 +1,69 @@
+@model Raktarkezelo.Models.Viewmodel.ProductViewModel
+
+@{
+    ViewData["Title"] = "Termék szerkesztése";
+}
+
+<style>
+    .page { min-height: 100vh; background:var(--bg-main); color:var(--text-primary); display: flex; font-family: Arial, Helvetica, sans-serif; }
+    .content { flex: 1; padding: 40px; overflow-y: auto; }
+    .form-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius: 10px; padding: 32px; max-width: 620px; margin: auto; }
+    .form-label { color:var(--text-muted); font-size: 14px; margin-bottom: 4px; }
+    .form-control { background:var(--bg-input); border:1px solid var(--border-input); color:var(--text-primary); border-radius: 7px; }
+    .form-control:focus { background:var(--bg-input); color:var(--text-primary); border-color: #0d6efd; box-shadow: none; }
+    .form-control[readonly] { background: #1a1a1a; color:var(--text-muted); cursor: not-allowed; }
+    .form-text { color:var(--text-muted); font-size: 12px; }
+    @@media (max-width: 768px) { .page { flex-direction: column; } .content { padding: 20px; } }
+</style>
+
+<div class="page">
+    @await Html.PartialAsync("_Sidebar")
+
+    <main class="content">
+        <div class="form-card">
+            <h2 class="mb-4">Termék szerkesztése</h2>
+
+            <form asp-action="EditProduct" method="post">
+                @Html.AntiForgeryToken()
+                <input asp-for="ProductId" type="hidden" />
+
+                <div class="mb-3">
+                    <label asp-for="Name" class="form-label">Megnevezés</label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Category" class="form-label">Kategória</label>
+                    <input asp-for="Category" class="form-control" />
+                    <span asp-validation-for="Category" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Aktuális készlet</label>
+                    <input value="@Model.Stock" class="form-control" readonly />
+                    <div class="form-text">A készletszint csak bevételezéssel, kiadással vagy korrekcióval módosítható.</div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="MinStock" class="form-label">Minimum készlet</label>
+                    <input asp-for="MinStock" class="form-control" />
+                    <span asp-validation-for="MinStock" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Note" class="form-label">Megjegyzés</label>
+                    <textarea asp-for="Note" class="form-control" rows="2"></textarea>
+                    <span asp-validation-for="Note" class="text-danger small"></span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Mentés</button>
+                    <a asp-action="Products" class="btn btn-secondary">Vissza</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

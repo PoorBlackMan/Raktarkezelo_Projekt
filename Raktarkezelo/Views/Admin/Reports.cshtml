@@ -1,0 +1,236 @@
+@model List<Raktarkezelo.Models.Entities.StockTransactions>
+
+@{
+    ViewData["Title"] = "Riportok";
+    string? selectedType = ViewBag.SelectedType as string;
+    var selectedProductId = ViewBag.SelectedProductId;
+}
+
+<style>
+    .page {
+        min-height: 100vh;
+        background:var(--bg-main);
+        color:var(--text-primary);
+        display: flex;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .content {
+        flex: 1;
+        padding: 40px;
+        overflow-y: auto;
+    }
+
+    .wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .filter-card {
+        background:var(--bg-card);
+        border:1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 24px;
+        margin-bottom: 28px;
+    }
+
+    .result-card {
+        background:var(--bg-card);
+        border:1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 24px;
+    }
+
+    .form-label {
+        color:var(--text-muted);
+        font-size: 13px;
+    }
+
+    .form-control, .form-select {
+        background:var(--bg-input);
+        border:1px solid var(--border-input);
+        color:var(--text-primary);
+    }
+
+        .form-control:focus, .form-select:focus {
+            background:var(--bg-input);
+            color:var(--text-primary);
+            border-color: #0d6efd;
+            box-shadow: none;
+        }
+
+        .form-select option {
+            background:var(--bg-input);
+        }
+
+    .type-in {
+        color:var(--clr-success);
+        font-weight: 600;
+    }
+
+    .type-out {
+        color:var(--clr-danger);
+        font-weight: 600;
+    }
+
+    .type-adj {
+        color:var(--clr-warning);
+        font-weight: 600;
+    }
+
+    @@media (max-width: 768px) {
+        .page {
+            flex-direction: column;
+        }
+
+        .content {
+            padding: 20px;
+        }
+    }
+</style>
+
+<div class="page">
+    @await Html.PartialAsync("_Sidebar")
+
+    <main class="content">
+        <div class="wrap">
+            <h1 class="mb-4">📊 Riportok</h1>
+
+            <div class="filter-card">
+                <form method="get" asp-action="Reports">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Kezdő dátum</label>
+                            <input type="date" name="fromDate" class="form-control" value="@ViewBag.SelectedFromDate" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Záró dátum</label>
+                            <input type="date" name="toDate" class="form-control" value="@ViewBag.SelectedToDate" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Művelet típusa</label>
+                            <select name="type" class="form-select">
+                                <option value="">-- Összes típus --</option>
+
+                                @if (selectedType == "IN")
+                                {
+                                    <option value="IN" selected>Bevételezés</option>
+                                }
+                                else
+                                {
+                                    <option value="IN">Bevételezés</option>
+                                }
+
+                                @if (selectedType == "OUT")
+                                {
+                                    <option value="OUT" selected>Kiadás</option>
+                                }
+                                else
+                                {
+                                    <option value="OUT">Kiadás</option>
+                                }
+
+                                @if (selectedType == "ADJUST")
+                                {
+                                    <option value="ADJUST" selected>Korrekció</option>
+                                }
+                                else
+                                {
+                                    <option value="ADJUST">Korrekció</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Termék</label>
+                            <select name="productId" class="form-select">
+                                <option value="">-- Összes termék --</option>
+                                @foreach (var p in ViewBag.Products)
+                                {
+                                    if (selectedProductId != null && selectedProductId == p.ProductId)
+                                    {
+                                        <option value="@p.ProductId" selected>@p.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@p.ProductId">@p.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary w-100">Szűrés</button>
+                        </div>
+                        <div class="col-md-4">
+                            <a asp-action="Reports" class="btn btn-secondary w-100">Szűrők törlése</a>
+                        </div>
+                        <div class="col-md-4">
+                            <a asp-action="ExportExcel"
+                               asp-route-fromDate="@ViewBag.SelectedFromDate"
+                               asp-route-toDate="@ViewBag.SelectedToDate"
+                               asp-route-type="@ViewBag.SelectedType"
+                               asp-route-productId="@ViewBag.SelectedProductId"
+                               class="btn btn-success w-100">
+                                📥 Exportálás Excelbe
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="result-card">
+                <h4 class="mb-3">
+                    Készletmozgások
+                    <span class="text-muted small fw-normal">(@Model.Count találat)</span>
+                </h4>
+
+                @if (!Model.Any())
+                {
+                    <div class="alert alert-warning mb-0">Nincs találat a megadott szűrési feltételekre.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-dark table-striped align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Termék</th>
+                                    <th>Típus</th>
+                                    <th>Mennyiség</th>
+                                    <th>Felhasználó</th>
+                                    <th>Dátum</th>
+                                    <th>Megjegyzés</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>@item.Product?.Name</td>
+                                        <td>
+                                            @if (item.Type == "IN")
+                                            {
+                                                <span class="type-in">Bevételezés</span>
+                                            }
+                                            else if (item.Type == "OUT")
+                                            {
+                                                <span class="type-out">Kiadás</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="type-adj">Korrekció</span>
+                                            }
+                                        </td>
+                                        <td>@item.Quantity</td>
+                                        <td>@item.User?.Username</td>
+                                        <td>@item.CreatedAt.ToString("yyyy.MM.dd HH:mm")</td>
+                                        <td>@item.Note</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </main>
+</div>

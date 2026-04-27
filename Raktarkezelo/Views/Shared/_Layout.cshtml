@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="hu" id="htmlRoot" data-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Raktárkezelő</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Raktarkezelo.styles.css" asp-append-version="true" />
+
+    <style>
+        /* ══════════════════════════════════════════════════════════════
+           TÉMÁK  –  data-theme="dark" | "light" | "high-contrast"
+        ══════════════════════════════════════════════════════════════ */
+        :root,
+        [data-theme="dark"] {
+            --bg-main:       #0b0f14;
+            --bg-surface:    #161616;
+            --bg-card:       #1c1c1c;
+            --bg-input:      #2a2a2a;
+            --border-color:  #2a2a2a;
+            --border-input:  #3a3a3a;
+            --text-primary:  #eaeaea;
+            --text-muted:    #888888;
+            --accent:        #0d6efd;
+            --accent-hover:  #0b5ed7;
+            --nav-bg:        #161616;
+            --nav-border:    rgba(255,255,255,0.15);
+            --nav-link:      #cccccc;
+            --nav-active-bg: #1e3a5f;
+            --nav-active-fg: #60a5fa;
+            --row-stripe:    rgba(255,255,255,0.03);
+            --badge-admin:   #dc3545;
+            --badge-manager: #6f42c1;
+            --badge-user:    #0d6efd;
+            --badge-active:  #198754;
+            --badge-inactive:#6c757d;
+            --clr-success:   #4ade80;
+            --clr-danger:    #f87171;
+            --clr-warning:   #facc15;
+            --footer-bg:     #000000;
+        }
+
+        [data-theme="light"] {
+            --bg-main:       #f0f2f5;
+            --bg-surface:    #ffffff;
+            --bg-card:       #ffffff;
+            --bg-input:      #ffffff;
+            --border-color:  #dee2e6;
+            --border-input:  #ced4da;
+            --text-primary:  #1a1a2e;
+            --text-muted:    #6c757d;
+            --accent:        #0d6efd;
+            --accent-hover:  #0b5ed7;
+            --nav-bg:        #1a1a2e;
+            --nav-border:    rgba(0,0,0,0.15);
+            --nav-link:      #e0e0e0;
+            --nav-active-bg: #0d3a7a;
+            --nav-active-fg: #90c4ff;
+            --row-stripe:    rgba(0,0,0,0.03);
+            --badge-admin:   #dc3545;
+            --badge-manager: #6f42c1;
+            --badge-user:    #0d6efd;
+            --badge-active:  #198754;
+            --badge-inactive:#6c757d;
+            --clr-success:   #198754;
+            --clr-danger:    #dc3545;
+            --clr-warning:   #d97706;
+            --footer-bg:     #1a1a2e;
+        }
+
+        [data-theme="high-contrast"] {
+            --bg-main:       #000000;
+            --bg-surface:    #0a0a0a;
+            --bg-card:       #111111;
+            --bg-input:      #0d0d0d;
+            --border-color:  #ffffff;
+            --border-input:  #ffffff;
+            --text-primary:  #ffffff;
+            --text-muted:    #dddddd;
+            --accent:        #ffff00;
+            --accent-hover:  #e6e600;
+            --nav-bg:        #000000;
+            --nav-border:    #ffffff;
+            --nav-link:      #ffffff;
+            --nav-active-bg: #333300;
+            --nav-active-fg: #ffff00;
+            --row-stripe:    rgba(255,255,255,0.06);
+            --badge-admin:   #ff4444;
+            --badge-manager: #cc66ff;
+            --badge-user:    #4488ff;
+            --badge-active:  #00cc66;
+            --badge-inactive:#999999;
+            --clr-success:   #00ff88;
+            --clr-danger:    #ff4444;
+            --clr-warning:   #ffff00;
+            --footer-bg:     #000000;
+        }
+
+        /* ── Base ─────────────────────────────────────────────────── */
+        html, body { height: 100%; }
+        body {
+            margin: 0;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        main  { flex: 1; }
+        footer {
+            background: var(--footer-bg);
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+            text-align: center;
+            padding: 12px 0;
+            font-size: 0.9rem;
+        }
+
+        /* ── Sidebar theme tokens ─────────────────────────────────── */
+        .sidebar {
+            background: var(--nav-bg) !important;
+            border-right: 1px solid var(--nav-border) !important;
+        }
+        .brand       { color: var(--text-primary)  !important; }
+        .menu-title  { color: var(--text-muted)    !important; }
+        .navlink     { color: var(--nav-link)       !important; }
+        .navlink:hover    { background: var(--row-stripe) !important; color: var(--text-primary) !important; }
+        .navlink.active   { background: var(--nav-active-bg) !important; color: var(--nav-active-fg) !important; }
+        .navlink.logout:hover { background: rgba(248,113,113,0.1) !important; color: var(--clr-danger) !important; }
+        .nav-divider { border-color: var(--border-color) !important; }
+        .navhint     { color: var(--text-muted) !important; }
+        .hamburger   { color: var(--nav-link) !important; }
+
+        /* ── Cards / panels ──────────────────────────────────────── */
+        .panel, .form-card, .filter-card, .result-card,
+        .chart-box, .stat-box, .profile-card, .user-badge {
+            background: var(--bg-card)      !important;
+            border-color: var(--border-color) !important;
+        }
+        .stat-label  { color: var(--text-muted)   !important; }
+        .warning-table th { background: var(--bg-surface) !important; color: var(--text-muted) !important; }
+        .warning-table th, .warning-table td { border-color: var(--border-color) !important; }
+
+        /* ── Inputs ──────────────────────────────────────────────── */
+        .form-control, .form-select {
+            background:   var(--bg-input)    !important;
+            border-color: var(--border-input) !important;
+            color:        var(--text-primary) !important;
+        }
+        .form-select option { background: var(--bg-input); color: var(--text-primary); }
+
+        /* ── Tables ──────────────────────────────────────────────── */
+        .table-dark {
+            --bs-table-bg:         var(--bg-card);
+            --bs-table-striped-bg: var(--row-stripe);
+        }
+        .table.table-dark td, .table.table-dark th {
+            border-color: var(--border-color) !important;
+        }
+
+        /* ── Badges ──────────────────────────────────────────────── */
+        .badge-admin    { background: var(--badge-admin)    !important; }
+        .badge-manager  { background: var(--badge-manager)  !important; }
+        .badge-user     { background: var(--badge-user)     !important; }
+        .badge-active   { background: var(--badge-active)   !important; }
+        .badge-inactive { background: var(--badge-inactive) !important; }
+
+        /* ── High-contrast extras ─────────────────────────────────── */
+        [data-theme="high-contrast"] .form-control,
+        [data-theme="high-contrast"] .form-select,
+        [data-theme="high-contrast"] .btn,
+        [data-theme="high-contrast"] .panel,
+        [data-theme="high-contrast"] .form-card { outline: 1px solid #ffffff !important; }
+        [data-theme="high-contrast"] a           { color: #ffff00 !important; text-decoration: underline !important; }
+        [data-theme="high-contrast"] .btn-primary {
+            background: #ffff00 !important; color: #000 !important; border-color: #ffff00 !important;
+        }
+        [data-theme="high-contrast"] .navlink { text-decoration: none !important; }
+
+        /* ── Settings floating button ─────────────────────────────── */
+        #settings-bar {
+            position: fixed; bottom: 20px; right: 20px;
+            z-index: 9999; display: flex;
+            flex-direction: column; align-items: flex-end; gap: 8px;
+        }
+        #settings-toggle {
+            width: 46px; height: 46px; border-radius: 50%;
+            background: var(--accent); border: 2px solid rgba(255,255,255,0.2);
+            color: #fff; font-size: 20px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+            transition: transform 0.15s, background 0.15s; outline: none;
+        }
+        #settings-toggle:hover { transform: scale(1.1); background: var(--accent-hover); }
+
+        #settings-panel {
+            background: var(--bg-card); border: 1px solid var(--border-color);
+            border-radius: 12px; padding: 18px 20px;
+            display: none; min-width: 234px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.6);
+        }
+        #settings-panel.open { display: block; }
+
+        .sp-title {
+            font-size: 11px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 1px; color: var(--text-muted); margin-bottom: 14px;
+        }
+        .sp-divider { border: none; border-top: 1px solid var(--border-color); margin: 12px 0; }
+        .sp-label   { font-size: 11px; color: var(--text-muted); text-transform: uppercase;
+                      letter-spacing: 1px; margin-bottom: 6px; display: block; }
+
+        /* Theme buttons */
+        .theme-btns { display: flex; gap: 6px; }
+        .theme-btn  {
+            flex: 1; padding: 6px 4px; font-size: 12px;
+            border-radius: 7px; cursor: pointer;
+            border: 1px solid var(--border-input);
+            background: var(--bg-input); color: var(--text-primary);
+            text-align: center; transition: all 0.15s; white-space: nowrap;
+        }
+        .theme-btn:hover  { border-color: var(--accent); }
+        .theme-btn.active { border-color: var(--accent); background: var(--accent); color: #fff; font-weight: 600; }
+
+        /* Font buttons */
+        .font-btns { display: flex; gap: 4px; flex: 1; }
+        .sp-btn {
+            flex: 1; background: var(--bg-input); border: 1px solid var(--border-input);
+            color: var(--text-primary); border-radius: 6px;
+            padding: 4px 8px; cursor: pointer; font-size: 13px; transition: background 0.12s;
+        }
+        .sp-btn:hover  { background: var(--border-color); }
+        .sp-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+        #font-size-label { font-size: 12px; color: var(--text-muted); min-width: 34px; text-align: right; }
+
+        /* Compact mode row */
+        .sp-row {
+            display: flex; align-items: center;
+            justify-content: space-between;
+            font-size: 13px; color: var(--text-primary);
+        }
+
+        /* ── Compact mode ─────────────────────────────────────────── */
+        .compact-mode .content   { padding: 20px !important; }
+        .compact-mode .panel     { padding: 14px !important; margin-bottom: 14px !important; }
+        .compact-mode .form-card { padding: 18px !important; }
+        .compact-mode .stat-box  { padding: 12px 16px !important; }
+        .compact-mode .navlink   { padding: 5px 10px !important; }
+        .compact-mode .navlist li{ margin-bottom: 2px !important; }
+        .compact-mode h1         { font-size: 1.4em !important; }
+        .compact-mode h2         { font-size: 1.1em !important; }
+    </style>
+</head>
+<body>
+    <main>@RenderBody()</main>
+
+    <footer>&copy; 2026 - Raktárkezelő</footer>
+
+    <!-- ── Floating settings panel ──────────────────────────────── -->
+    <div id="settings-bar">
+        <div id="settings-panel" role="dialog" aria-label="Megjelenítési beállítások">
+
+            <div class="sp-title">⚙️ Megjelenítés</div>
+
+            <!-- Theme -->
+            <label class="sp-label">Téma</label>
+            <div class="theme-btns" style="margin-bottom:12px;">
+                <button class="theme-btn" id="btn-dark"  onclick="setTheme('dark')"          title="Sötét">🌙 Sötét</button>
+                <button class="theme-btn" id="btn-light" onclick="setTheme('light')"         title="Világos">☀️ Világos</button>
+                <button class="theme-btn" id="btn-hc"    onclick="setTheme('high-contrast')" title="Nagy kontraszt">◑ Kontraszt</button>
+            </div>
+
+            <hr class="sp-divider" />
+
+            <!-- Font size -->
+            <label class="sp-label">Betűméret</label>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                <div class="font-btns">
+                    <button class="sp-btn" onclick="changeFont(-1)" title="Kisebb">A−</button>
+                    <button class="sp-btn" onclick="changeFont(0)"  title="Visszaállítás">A</button>
+                    <button class="sp-btn" onclick="changeFont(1)"  title="Nagyobb">A+</button>
+                </div>
+                <span id="font-size-label">16px</span>
+            </div>
+
+            <hr class="sp-divider" />
+
+            <!-- Compact -->
+            <div class="sp-row">
+                <span>Kompakt nézet</span>
+                <button class="sp-btn" id="compactBtn" onclick="toggleCompact()" style="flex:0;padding:4px 12px;">Ki</button>
+            </div>
+
+        </div>
+
+        <button id="settings-toggle" onclick="toggleSettingsPanel()"
+                aria-expanded="false" aria-controls="settings-panel"
+                title="Megjelenítési beállítások">⚙️</button>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+    function lsGet(k,d){try{return localStorage.getItem(k)??d;}catch{return d;}}
+    function lsSet(k,v){try{localStorage.setItem(k,v);}catch{}}
+
+    // ── THEME ──────────────────────────────────────────────────────────
+    let currentTheme = lsGet('theme','dark');
+    function setTheme(t) {
+        currentTheme = t;
+        document.getElementById('htmlRoot').setAttribute('data-theme', t);
+        lsSet('theme', t);
+        ['dark','light','hc'].forEach(id => {
+            const btn = document.getElementById('btn-'+id);
+            if (btn) btn.classList.toggle('active',
+                (id==='hc' ? 'high-contrast' : id) === t);
+        });
+    }
+    setTheme(currentTheme);
+
+    // ── FONT SIZE ──────────────────────────────────────────────────────
+    const FSIZES  = [13,15,16,18,20,22];
+    let fontIdx = parseInt(lsGet('fontIdx','2'));
+    function applyFont() {
+        document.getElementById('htmlRoot').style.fontSize = FSIZES[fontIdx]+'px';
+        const lbl = document.getElementById('font-size-label');
+        if (lbl) lbl.textContent = FSIZES[fontIdx]+'px';
+    }
+    function changeFont(dir) {
+        if (dir===0) fontIdx=2;
+        else fontIdx = Math.max(0, Math.min(FSIZES.length-1, fontIdx+dir));
+        lsSet('fontIdx', fontIdx);
+        applyFont();
+    }
+    applyFont();
+
+    // ── COMPACT ────────────────────────────────────────────────────────
+    let compactOn = lsGet('compact','0')==='1';
+    function applyCompact() {
+        document.getElementById('htmlRoot').classList.toggle('compact-mode', compactOn);
+        const btn = document.getElementById('compactBtn');
+        if (btn) { btn.textContent = compactOn?'Be':'Ki'; btn.classList.toggle('active',compactOn); }
+    }
+    function toggleCompact() { compactOn=!compactOn; lsSet('compact',compactOn?'1':'0'); applyCompact(); }
+    applyCompact();
+
+    // ── PANEL ──────────────────────────────────────────────────────────
+    function toggleSettingsPanel() {
+        const p = document.getElementById('settings-panel');
+        const t = document.getElementById('settings-toggle');
+        const open = p.classList.toggle('open');
+        t.setAttribute('aria-expanded', open);
+    }
+    document.addEventListener('click', e => {
+        const bar = document.getElementById('settings-bar');
+        if (bar && !bar.contains(e.target))
+            document.getElementById('settings-panel').classList.remove('open');
+    });
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,104 @@
+@model List<Raktarkezelo.Models.Entities.AuditLog>
+@{
+    ViewData["Title"] = "Tevékenységnapló";
+}
+<style>
+    .page { min-height:100vh; background:var(--bg-main); color:var(--text-primary); display:flex; font-family:Arial,Helvetica,sans-serif; }
+    .content { flex:1; padding:40px; overflow-y:auto; }
+    .wrap { max-width:1300px; margin:0 auto; }
+    .filter-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:10px; padding:20px 24px; margin-bottom:24px; }
+    .form-label { color:var(--text-muted); font-size:13px; }
+    .form-control, .form-select { background:var(--bg-input); border:1px solid var(--border-input); color:var(--text-primary); }
+    .form-control:focus, .form-select:focus { background:var(--bg-input); color:var(--text-primary); border-color:#0d6efd; box-shadow:none; }
+    .form-select option { background:var(--bg-input); }
+    .action-badge { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:600; }
+    .act-Login         { background:#14532d; color:#4ade80; }
+    .act-Logout        { background:#1c1917; color:#a8a29e; }
+    .act-StockIn       { background:#14532d; color:#86efac; }
+    .act-StockOut      { background:#450a0a; color:#fca5a5; }
+    .act-StockAdjust   { background:#451a03; color:#fcd34d; }
+    .act-ProductCreate { background:#1e3a5f; color:#93c5fd; }
+    .act-ProductEdit   { background:#1e3a5f; color:#60a5fa; }
+    .act-ProductDelete { background:#450a0a; color:#f87171; }
+    .act-UserCreate    { background:#1e1b4b; color:#a5b4fc; }
+    .act-UserEdit      { background:#1e1b4b; color:#818cf8; }
+    .act-UserDelete    { background:#450a0a; color:#f87171; }
+    .act-UserToggle    { background:#1c1917; color:#d4d4d8; }
+    .act-PasswordReset { background:#451a03; color:#fbbf24; }
+    .act-ProfileEdit   { background:#1e3a5f; color:#7dd3fc; }
+    @@media(max-width:768px){ .page{flex-direction:column;} .content{padding:20px;} }
+</style>
+<div class="page">
+    @await Html.PartialAsync("_Sidebar")
+    <main class="content">
+        <div class="wrap">
+            <h1 class="mb-4">📋 Tevékenységnapló</h1>
+
+            <div class="filter-card">
+                <form method="get" asp-action="AuditLog">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Felhasználó</label>
+                            <input type="text" name="username" class="form-control" placeholder="Felhasználónév..."
+                                   value="@ViewBag.SelectedUsername" />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Művelet típusa</label>
+                            <select name="action" class="form-select">
+                                <option value="">-- Összes --</option>
+                                @foreach (var a in new[] { "Login","Logout","StockIn","StockOut","StockAdjust","ProductCreate","ProductEdit","ProductDelete","UserCreate","UserEdit","UserDelete","UserToggle","PasswordReset","ProfileEdit" })
+                                {
+                                    <option value="@a" selected="@( (string?)ViewBag.SelectedAction == a )">@a</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Kezdő dátum</label>
+                            <input type="date" name="fromDate" class="form-control" value="@ViewBag.SelectedFromDate" />
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Záró dátum</label>
+                            <input type="date" name="toDate" class="form-control" value="@ViewBag.SelectedToDate" />
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">Szűr</button>
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <a asp-action="AuditLog" class="btn btn-secondary w-100">Töröl</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <p class="text-muted small mb-2">@Model.Count bejegyzés (max. 500)</p>
+
+            <div class="table-responsive">
+                <table class="table table-dark table-striped table-bordered align-middle" style="font-size:13px;">
+                    <thead>
+                        <tr>
+                            <th>Dátum</th>
+                            <th>Felhasználó</th>
+                            <th>Művelet</th>
+                            <th>Részletek</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var log in Model)
+                        {
+                            <tr>
+                                <td style="white-space:nowrap;">@log.CreatedAt.ToString("yyyy.MM.dd HH:mm:ss")</td>
+                                <td>@log.Username</td>
+                                <td><span class="action-badge act-@log.Action">@log.Action</span></td>
+                                <td>@log.Details</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            @if (!Model.Any())
+            {
+                <div class="alert alert-secondary">Nincs találat a szűrési feltételekre.</div>
+            }
+        </div>
+    </main>
+</div>

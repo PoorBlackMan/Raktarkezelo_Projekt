@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.4.11626.88 stable
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raktarkezelo", "Raktarkezelo\Raktarkezelo.csproj", "{AFBAD98C-C828-4315-8787-D779F85FB892}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Raktarkezelo.Tests", "Raktarkezelo.Tests\Raktarkezelo.Tests.csproj", "{11CB27A7-6FEE-4A1A-A8BA-6DD860BE5290}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AFBAD98C-C828-4315-8787-D779F85FB892}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFBAD98C-C828-4315-8787-D779F85FB892}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFBAD98C-C828-4315-8787-D779F85FB892}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFBAD98C-C828-4315-8787-D779F85FB892}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11CB27A7-6FEE-4A1A-A8BA-6DD860BE5290}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11CB27A7-6FEE-4A1A-A8BA-6DD860BE5290}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11CB27A7-6FEE-4A1A-A8BA-6DD860BE5290}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11CB27A7-6FEE-4A1A-A8BA-6DD860BE5290}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C9B7A746-9003-4ECC-BC08-EE4BF1261E33}
+	EndGlobalSection
+EndGlobal

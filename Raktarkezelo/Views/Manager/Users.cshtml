@@ -1,0 +1,149 @@
+@model List<Raktarkezelo.Models.Entities.Userinfo>
+
+@{
+    ViewData["Title"] = "Felhasználók";
+    bool isManager = User.IsInRole("Manager");
+    int currentUserId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+}
+
+<style>
+    .page { min-height: 100vh; background:var(--bg-main); color:var(--text-primary); display: flex; font-family: Arial, Helvetica, sans-serif; }
+    .content { flex: 1; padding: 40px; overflow-y: auto; }
+    .wrap { max-width: 1200px; margin: 0 auto; }
+    .badge-manager  { background: #6f42c1; color: white; padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+    .badge-admin    { background: #dc3545; color: white; padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+    .badge-user     { background: #0d6efd; color: white; padding: 2px 10px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+    .badge-active   { background: #198754; color: white; padding: 2px 10px; border-radius: 4px; font-size: 12px; }
+    .badge-inactive { background: #6c757d; color: white; padding: 2px 10px; border-radius: 4px; font-size: 12px; }
+    .readonly-notice { background: #1a2a1a; border: 1px solid #2d4a2d; border-radius: 8px; padding: 10px 16px; color: #6fcf6f; font-size: 14px; margin-bottom: 20px; }
+    @@media (max-width: 768px) { .page { flex-direction: column; } .content { padding: 20px; } }
+</style>
+
+<div class="page">
+    @await Html.PartialAsync("_Sidebar")
+
+    <main class="content">
+        <div class="wrap">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1>Felhasználók</h1>
+                @if (isManager)
+                {
+                    <a asp-action="CreateUser" class="btn btn-success">+ Új felhasználó</a>
+                }
+            </div>
+
+            @if (!isManager)
+            {
+                <div class="readonly-notice">
+                    👁 Csak megtekintés — a felhasználók kezeléséhez manager jogkör szükséges.
+                </div>
+            }
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show">
+                    @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show">
+                    @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            }
+
+            <div class="table-responsive">
+                <table class="table table-dark table-striped table-bordered align-middle">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Felhasználónév</th>
+                            <th>Email</th>
+                            <th>Szerepkör</th>
+                            <th>Státusz</th>
+                            @if (isManager)
+                            {
+                                <th>Műveletek</th>
+                            }
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>
+                                    @item.Username
+                                    @if (item.Id == currentUserId)
+                                    {
+                                        <span class="text-warning small">(te)</span>
+                                    }
+                                </td>
+                                <td>@item.Email</td>
+                                <td>
+                                    @if (item.Role == Raktarkezelo.Models.Enums.UserRole.Manager)
+                                    { <span class="badge-manager">Manager</span> }
+                                    else if (item.Role == Raktarkezelo.Models.Enums.UserRole.Admin)
+                                    { <span class="badge-admin">Admin</span> }
+                                    else
+                                    { <span class="badge-user">Felhasználó</span> }
+                                </td>
+                                <td>
+                                    @if (item.IsActive)
+                                    { <span class="badge-active">Aktív</span> }
+                                    else
+                                    { <span class="badge-inactive">Inaktív</span> }
+                                </td>
+
+                                @if (isManager)
+                                {
+                                    <td class="d-flex gap-1 flex-wrap">
+                                        @{
+                                            bool isSelf = item.Id == currentUserId;
+                                            bool isOtherManager = item.Role == Raktarkezelo.Models.Enums.UserRole.Manager && !isSelf;
+                                        }
+
+                                        @if (!isOtherManager)
+                                        {
+                                            <a asp-action="EditUser" asp-route-id="@item.Id"
+                                               class="btn btn-sm btn-primary">Szerkesztés</a>
+
+                                            <a asp-action="ResetPassword" asp-route-id="@item.Id"
+                                               class="btn btn-sm btn-warning">Jelszó reset</a>
+                                        }
+
+                                        @if (!isSelf && !isOtherManager)
+                                        {
+                                            <form asp-action="ToggleStatus" asp-route-id="@item.Id"
+                                                  method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit"
+                                                        class="btn btn-sm @(item.IsActive ? "btn-secondary" : "btn-success")">
+                                                    @(item.IsActive ? "Letiltás" : "Aktiválás")
+                                                </button>
+                                            </form>
+
+                                            <form asp-action="DeleteUser" asp-route-id="@item.Id"
+                                                  method="post" class="d-inline"
+                                                  onsubmit="return confirm('Biztosan törlöd: @item.Username?')">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-danger">Törlés</button>
+                                            </form>
+                                        }
+
+                                        @if (isSelf || isOtherManager)
+                                        {
+                                            <span class="text-muted small">—</span>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>

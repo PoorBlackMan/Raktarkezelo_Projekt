@@ -1,0 +1,86 @@
+@model Raktarkezelo.Models.Viewmodel.StockTransactionViewModel
+@using Raktarkezelo.Models.Entities
+
+@{
+    ViewData["Title"] = "Kiadás";
+    var transactions = ViewBag.RecentTransactions as List<StockTransactions> ?? new List<StockTransactions>();
+}
+
+<style>
+    .page { min-height: 100vh; background:var(--bg-main); color:var(--text-primary); display: flex; font-family: Arial, Helvetica, sans-serif; }
+    .content { flex: 1; padding: 40px; overflow-y: auto; }
+    .wrap { max-width: 900px; margin: 0 auto; }
+    .form-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius: 10px; padding: 28px; margin-bottom: 32px; }
+    .form-label { color:var(--text-muted); font-size: 14px; }
+    .form-control, .form-select { background:var(--bg-input); border:1px solid var(--border-input); color:var(--text-primary); }
+    .form-control:focus, .form-select:focus { background:var(--bg-input); color:var(--text-primary); border-color: #0d6efd; box-shadow: none; }
+    .form-select option { background:var(--bg-input); }
+    @@media (max-width: 768px) { .page { flex-direction: column; } .content { padding: 20px; } }
+</style>
+
+<div class="page">
+    @await Html.PartialAsync("_Sidebar")
+
+    <main class="content">
+        <div class="wrap">
+            <h1 class="mb-4">📤 Kiadás</h1>
+
+            <div class="form-card">
+                <form asp-action="Outbound" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="text-danger mb-3">@Html.ValidationSummary(false)</div>
+
+                    <div class="mb-3">
+                        <label asp-for="ProductId" class="form-label">Termék</label>
+                        <select asp-for="ProductId" asp-items="Model.Products" class="form-select">
+                            <option value="">-- Válassz terméket --</option>
+                        </select>
+                        <span asp-validation-for="ProductId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Quantity" class="form-label">Mennyiség</label>
+                        <input asp-for="Quantity" class="form-control" />
+                        <span asp-validation-for="Quantity" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Note" class="form-label">Megjegyzés</label>
+                        <input asp-for="Note" class="form-control" placeholder="Opcionális..." />
+                    </div>
+
+                    <button type="submit" class="btn btn-danger">Mentés</button>
+                    <a asp-controller="Main" asp-action="Main" class="btn btn-secondary">Vissza</a>
+                </form>
+            </div>
+
+            <h3 class="mb-3">Legutóbbi kiadások</h3>
+            <table class="table table-dark table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Termék</th>
+                        <th>Mennyiség</th>
+                        <th>Felhasználó</th>
+                        <th>Megjegyzés</th>
+                        <th>Dátum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in transactions)
+                    {
+                        <tr>
+                            <td>@item.Product.Name</td>
+                            <td>@item.Quantity</td>
+                            <td>@item.User.Username</td>
+                            <td>@item.Note</td>
+                            <td>@item.CreatedAt.ToString("yyyy.MM.dd HH:mm")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
